@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import Form from 'react-bootstrap/Form';
+import Button from 'react-bootstrap/Button';
 
 export default function SignInForm(props) {
     const [email, setEmail] = useState('');
@@ -20,18 +22,31 @@ export default function SignInForm(props) {
     return (
         <div>
             <div>
-                {props.label}
-                <form onSubmit={handleSubmit}>
-                    <div>
-                        <label>email</label>
-                        <input type="text" onChange={handleEmailChange} value={email}></input>
-                    </div>
-                    <div>
-                        <label>password</label>
-                        <input type="text" onChange={handlePasswordChange} value={password}></input>
-                    </div>
-                    <input type="submit" value="Submit" />
-                </form>
+                <Form onSubmit={handleSubmit}>
+                    <Form.Group controlId="formBasicEmail">
+                        <Form.Label>Email address</Form.Label>
+                        <Form.Control
+                            // type="email"
+                            placeholder="Email"
+                            value={email}
+                            onChange={handleEmailChange}
+                        />
+                    </Form.Group>
+
+                    <Form.Group controlId="formBasicPassword">
+                        <Form.Label>Password</Form.Label>
+                        <Form.Control
+                            type="password"
+                            placeholder="Password"
+                            value={password}
+                            onChange={handlePasswordChange}
+                        />
+                    </Form.Group>
+
+                    <Button variant="primary" type="submit">
+                        Submit
+                    </Button>
+                </Form>
             </div>
         </div>
     );
