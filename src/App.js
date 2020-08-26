@@ -1,7 +1,7 @@
 import React from 'react';
 import './App.css';
 import SignIn from './SignIn';
-import TestComponent from './TestComponent';
+import Days from './Days';
 import {
   BrowserRouter as Router,
   Route,
@@ -14,7 +14,7 @@ function App() {
       <Router>
         <div>
           <Route exact path="/" component={SignIn} />
-          <Route path="/home" component={TestComponent} />
+          <Route path="/home" component={Days} />
         </div>
       </Router>
     </div>
