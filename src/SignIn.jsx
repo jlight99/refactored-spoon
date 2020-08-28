@@ -27,7 +27,7 @@ export default function SignIn() {
 
         if (type == 'login' && response.status == 302 ||
             type == 'signup' && response.status == 201) {
-            history.push('/home');
+            history.push('/days');
         } else {
             setError("error with " + type + "\n" + responseText);
         }

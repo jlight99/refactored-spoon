@@ -3,6 +3,7 @@ import Card from 'react-bootstrap/Card';
 import DatePicker from "react-datepicker";
 
 import "react-datepicker/dist/react-datepicker.css";
+import MyNavbar from './MyNavbar';
 
 export default function Days() {
     const [days, setDays] = useState([]);
@@ -50,6 +51,7 @@ export default function Days() {
 
     return (
         <div>
+            <MyNavbar />
             <div>
                 <DatePicker
                     selected={selectedDate}
