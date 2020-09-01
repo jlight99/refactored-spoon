@@ -1,25 +1,31 @@
 import React, { useEffect, useState } from 'react';
+import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
 import DatePicker from "react-datepicker";
 
 import "react-datepicker/dist/react-datepicker.css";
 import MyNavbar from './MyNavbar';
+import AddMealForm from './AddMealForm';
+
+const user = "5f4552d03b8cd948cd803e7c";
 
 export default function Days() {
     const [days, setDays] = useState([]);
     const [day, setDay] = useState();
     const [selectedDate, setSelectedDate] = useState(new Date());
+    const [showAddMealForm, setShowAddMealForm] = useState(false);
 
     useEffect(() => {
-        async function fetchDays(user) {
-            const responseJson = await getDays(user);
-            const filteredDay = getDayByDate(selectedDate, responseJson);   
-
-            setDay(filteredDay);
-            setDays(responseJson);
-        };
-        fetchDays("5f4552d03b8cd948cd803e7c");
+        fetchDays(user);
     }, []);
+
+    const fetchDays = async (user) => {
+        const responseJson = await getDays(user);
+        const filteredDay = getDayByDate(selectedDate, responseJson);
+
+        setDay(filteredDay);
+        setDays(responseJson);
+    };
 
     const getDays = async (user) => {
         const response = await fetch('http://localhost:8083/days?user=' + user, {
@@ -47,6 +53,63 @@ export default function Days() {
         setSelectedDate(date);
         const filteredDay = getDayByDate(date, days);
         setDay(filteredDay);
+    };
+
+    const onAddFoodButtonClick = () => {
+        setShowAddMealForm(true);
+    };
+
+    const submitAddMealForm = async (rawMeal) => {
+        const meal = {
+            Name: rawMeal.name,
+            Nutrition: {
+                Calories: rawMeal.nutrition.calories,
+            },
+            Foods: rawMeal.foods.map((rawFood) => {
+                const food = {
+                    Group: "food group",
+                    Name: rawFood.name,
+                    Nutrition: {
+                        Calories: rawFood.nutrition.calories,
+                    },
+                    Serving: rawFood.serving,
+                };
+                return food;
+            }),
+        };
+
+        const dateStr = selectedDate.getFullYear() + '-' + (selectedDate.getMonth() + 1) + '-' + selectedDate.getUTCDate();
+
+        const newMeals = day?.Meals;
+        if (day) {
+            newMeals.push(meal);
+        }
+
+        const response = await fetch('http://localhost:8083/day', {
+            method: day ? 'PUT' : 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                user: user,
+                date: dateStr,
+                meals: day ? newMeals : [meal],
+                nutrition: {
+                    calories: day ? day.Nutrition.Calories + meal.Nutrition.Calories : meal.Nutrition.Calories,
+                },
+            })
+        });
+
+        const responseText = await response.text();
+        console.log(responseText);
+
+        fetchDays(user);
+        setShowAddMealForm(false);
+    };
+
+    const cancelAddMealForm = () => {
+        setShowAddMealForm(false);
     };
 
     return (
@@ -95,6 +158,11 @@ export default function Days() {
                 </div>
             </div>}
             {!day && <div>no data for this date</div>}
+            {!showAddMealForm && <Button onClick={onAddFoodButtonClick}>Add food</Button>}
+            {showAddMealForm && <AddMealForm
+                submit={submitAddMealForm}
+                cancel={cancelAddMealForm}
+            />}
         </div>
     );
 }

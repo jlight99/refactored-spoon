@@ -1,0 +1,87 @@
+// Nutrient:
+// Id: 1008
+// Name: "Energy"
+// Number: "208"
+// Rank: 300
+// UnitName: "kcal"
+
+// Nutrient:
+// Id: 1087
+// Name: "Calcium, Ca"
+// Number: "301"
+// Rank: 5300
+// UnitName: "mg"
+
+// Id: 1089
+// Name: "Iron, Fe"
+// Number: "303"
+// Rank: 5400
+// UnitName: "mg"
+
+// Id: 1104
+// Name: "Vitamin A, IU"
+// Number: "318"
+// Rank: 7500
+// UnitName: "IU"
+
+// Id: 1162
+// Name: "Vitamin C, total ascorbic acid"
+// Number: "401"
+// Rank: 6300
+// UnitName: "mg"
+
+// Nutrient:
+// Id: 1003
+// Name: "Protein"
+// Number: "203"
+// Rank: 600
+// UnitName: "g"
+
+// Nutrient:
+// Id: 1004
+// Name: "Total lipid (fat)"
+// Number: "204"
+// Rank: 800
+// UnitName: "g"
+
+// Nutrient:
+// Id: 1005
+// Name: "Carbohydrate, by difference"
+// Number: "205"
+// Rank: 1110
+// UnitName: "g"
+
+// Nutrient:
+// Id: 2000
+// Name: "Sugars, total including NLEA"
+// Number: "269"
+// Rank: 1510
+// UnitName: "g"
+
+// Nutrient:
+// Id: 1079
+// Name: "Fiber, total dietary"
+// Number: "291"
+// Rank: 1200
+// UnitName: "g"
+
+// Nutrient:
+// Id: 1092
+// Name: "Potassium, K"
+// Number: "306"
+// Rank: 5700
+// UnitName: "mg"
+
+// Nutrient:
+// Id: 1093
+// Name: "Sodium, Na"
+// Number: "307"
+// Rank: 5800
+// UnitName: "mg"
+
+// Nutrient:
+// Id: 1253
+// Name: "Cholesterol"
+// Number: "601"
+// Rank: 15700
+// UnitName: "mg"

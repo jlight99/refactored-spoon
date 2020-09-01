@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import MyNavbar from './MyNavbar';
 import Form from 'react-bootstrap/Form';
 import FormControl from 'react-bootstrap/FormControl';
 import Button from 'react-bootstrap/Button';
@@ -24,10 +23,12 @@ export const NutrientIds = {
     CHOLESTEROL: 1253,
 };
 
-export default function FoodSearch() {
+export default function FoodSearch(props) {
     const [foodKeyword, setFoodKeyword] = useState('');
     const [searchResults, setSearchResults] = useState([]);
     const [foodDetails, setFoodDetails] = useState('');
+    const [foods, setFoods] = useState([]);
+    const [fdcIds, setFdcIds] = useState([]);
     // const [loadingDetails, setLoadingDetails] = useState(false);
 
     const handleSubmitSearch = async event => {
@@ -80,33 +81,63 @@ export default function FoodSearch() {
         viewDetails(result.FdcId);
     };
 
+    const addFood = (food, foodDetails) => {
+        const newFood = {
+            food: food,
+            foodDetails: foodDetails,
+        };
+        setFoods(foods => [...foods, newFood]);
+        setFdcIds(fdcIds => [...fdcIds, food.FdcId]);
+        props.addFood(newFood);
+    };
+
+    const removeFood = (garbageFdcId) => {
+        setFoods(foods.filter(food => food.food.FdcId != garbageFdcId));
+        setFdcIds(fdcIds.filter(fdcId => fdcId != garbageFdcId));
+        props.removeFood(garbageFdcId);
+    };
+
     return (
-        <div>
-            <MyNavbar />
-            <span style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
-                <span style={{ flexDirection: 'column' }}>
-                    <Form inline onSubmit={handleSubmitSearch}>
-                        <FormControl
-                            type="text"
-                            placeholder="Search"
-                            className="mr-sm-2"
-                            value={foodKeyword}
-                            onChange={handleFoodKeywordChange}
-                        />
-                        <Button type="submit">Search</Button>
-                    </Form>
-                    <div>
-                        <Accordion>
-                            {searchResults && searchResults.map((result) => (
-                                <Card key={result.FdcId} onClick={() => handleAccordionClick(result)}>
-                                    <Card.Header>
-                                        <Accordion.Toggle as={Button} variant="link" eventKey={result.FdcId}>
-                                            {result.Description}
-                                        </Accordion.Toggle>
-                                    </Card.Header>
-                                    <Accordion.Collapse eventKey={result.FdcId}>
-                                        <Card.Body>
-                                            {/* {loadingDetails &&
+        <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
+            <span style={{ flexDirection: 'column' }}>
+                {foods.map((food) => (
+                        <Card
+                            key={food.food.FdcId}
+                            style={{ width: '24rem', margin: '0 auto' }}
+                            className="mb-2"
+                        >
+                            <Card.Header>{food.food.FdcId}</Card.Header>
+                            <Card.Body>
+                                <Card.Text>
+                                    <span>FDC ID: {food.food.FdcId}</span><br />
+                                    <span>Description: {food.food.Description}</span><br />
+                                </Card.Text>
+                                <Button variant="danger" onClick={() => removeFood(food.food.FdcId)}>Remove</Button>
+                            </Card.Body>
+                        </Card>
+                    ))}
+                <Form inline onSubmit={handleSubmitSearch} style={{ margin: '10px' }}>
+                    <FormControl
+                        type="text"
+                        placeholder="Search"
+                        className="mr-sm-2"
+                        value={foodKeyword}
+                        onChange={handleFoodKeywordChange}
+                    />
+                    <Button type="submit">Search</Button>
+                </Form>
+                <div>
+                    <Accordion style={{ overflowY: 'scroll', maxHeight: '360px' }}>
+                        {searchResults && searchResults.map((result) => (
+                            <Card key={result.FdcId} onClick={() => handleAccordionClick(result)}>
+                                <Card.Header>
+                                    <Accordion.Toggle as={Button} variant="link" eventKey={result.FdcId}>
+                                        {result.Description}
+                                    </Accordion.Toggle>
+                                </Card.Header>
+                                <Accordion.Collapse eventKey={result.FdcId}>
+                                    <Card.Body>
+                                        {/* {loadingDetails &&
                                                 <Spinner animation="border" role="status">
                                                     <span className="sr-only">Loading...</span>
                                                 </Spinner>
@@ -114,33 +145,38 @@ export default function FoodSearch() {
                                             Brand: {result.BrandOwner}<br />
                                             Ingredients: {result.Ingredients}<br />
                                             FdcId: {result.FdcId}<br />
-                                            {foodDetails &&
+                                        {foodDetails &&
                                             /* {!loadingDetails && foodDetails && */
-                                                <Table>
-                                                    <thead>
-                                                        <tr>
-                                                            <th>Nutrient</th>
-                                                            <th>Amount (per 100 grams)</th>
+                                            <Table>
+                                                <thead>
+                                                    <tr>
+                                                        <th>Nutrient</th>
+                                                        <th>Amount (per 100 grams)</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {foodDetails.FoodNutrients.filter((foodNutrient) => [NutrientIds.ENERGY, NutrientIds.PROTEIN, NutrientIds.CARBOHYDRATE, NutrientIds.FAT].includes(foodNutrient.Nutrient.Id)
+                                                    ).map((foodNutrient) => (
+                                                        <tr key={foodNutrient.Id}>
+                                                            <td>{foodNutrient.Nutrient.Name}</td>
+                                                            <td>{foodNutrient.Amount} {foodNutrient.Nutrient.UnitName}</td>
                                                         </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        {foodDetails.FoodNutrients.filter((foodNutrient) => [NutrientIds.ENERGY, NutrientIds.PROTEIN].includes(foodNutrient.Nutrient.Id)
-                                                        ).map((foodNutrient) => (
-                                                            <tr key={foodNutrient.Id}>
-                                                                <td>{foodNutrient.Nutrient.Name}</td>
-                                                                <td>{foodNutrient.Amount} {foodNutrient.Nutrient.UnitName}</td>
-                                                            </tr>
-                                                        ))}
-                                                    </tbody>
-                                                </Table>
-                                            }
-                                        </Card.Body>
-                                    </Accordion.Collapse>
-                                </Card>
-                            ))}
-                        </Accordion>
-                    </div>
-                </span>
+                                                    ))}
+                                                </tbody>
+                                            </Table>
+                                        }
+                                        {!fdcIds.includes(result.FdcId) &&
+                                            <Button onClick={() => addFood(result, foodDetails)}>Select food</Button>
+                                        }
+                                        {fdcIds.includes(result.FdcId) &&
+                                            <span style={{ 'color': 'green' }}>Food selected</span>
+                                        }
+                                    </Card.Body>
+                                </Accordion.Collapse>
+                            </Card>
+                        ))}
+                    </Accordion>
+                </div>
             </span>
         </div>
     );

@@ -8,7 +8,7 @@ import {
   Redirect,
 } from "react-router-dom";
 import 'bootstrap/dist/css/bootstrap.min.css';
-import FoodSearch from './FoodSearch';
+import FoodSearchPage from './FoodSearchPage';
 
 function App() {
   return (
@@ -20,7 +20,7 @@ function App() {
           </Route>
           <Route path="/signin" component={SignIn} />
           <Route path="/days" component={Days} />
-          <Route path="/foodsearch" component={FoodSearch} />
+          <Route path="/foodsearch" component={FoodSearchPage} />
         </div>
       </Router>
     </div>

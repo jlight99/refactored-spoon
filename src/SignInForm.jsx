@@ -26,7 +26,7 @@ export default function SignInForm(props) {
                     <Form.Group controlId="formBasicEmail">
                         <Form.Label>Email address</Form.Label>
                         <Form.Control
-                            // type="email"
+                            type="email"
                             placeholder="Email"
                             value={email}
                             onChange={handleEmailChange}
