@@ -88,14 +88,22 @@ export default function FoodSearch(props) {
         };
         setFoods(foods => [...foods, newFood]);
         setFdcIds(fdcIds => [...fdcIds, food.FdcId]);
-        props.addFood(newFood);
+        if (props.addFood) {
+            props.addFood(newFood);
+        }
     };
 
     const removeFood = (garbageFdcId) => {
         setFoods(foods.filter(food => food.food.FdcId != garbageFdcId));
         setFdcIds(fdcIds.filter(fdcId => fdcId != garbageFdcId));
-        props.removeFood(garbageFdcId);
+        if (props.removeFood) {
+            props.removeFood(garbageFdcId);
+        }
     };
+
+    const getCalories = (food) => {
+        return food?.foodDetails?.FoodNutrients?.filter((foodNutrient) => foodNutrient?.Nutrient.Id == NutrientIds.ENERGY)[0]?.Amount;
+    }
 
     return (
         <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
@@ -111,6 +119,7 @@ export default function FoodSearch(props) {
                                 <Card.Text>
                                     <span>FDC ID: {food.food.FdcId}</span><br />
                                     <span>Description: {food.food.Description}</span><br />
+                                    <span>Calories: {getCalories(food)}</span>
                                 </Card.Text>
                                 <Button variant="danger" onClick={() => removeFood(food.food.FdcId)}>Remove</Button>
                             </Card.Body>
