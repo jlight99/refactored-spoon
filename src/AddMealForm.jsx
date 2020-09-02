@@ -79,7 +79,7 @@ export default function AddMealForm(props) {
             details: foodDetails,
         };
         setFoods(foods => [...foods, newFood]);
-        setFdcIds(fdcIds => [...fdcIds, food.fdcId]);
+        setFdcIds(fdcIds => [...fdcIds, food.FdcId]);
 
         setMealCalories(mealCalories + newFood.nutrition.calories);
     };
@@ -121,6 +121,7 @@ export default function AddMealForm(props) {
                             />
                         );
                     })}
+
                     <FoodSearch
                         selectFood={addFood}
                         showSelect
