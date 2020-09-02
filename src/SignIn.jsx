@@ -25,8 +25,8 @@ export default function SignIn() {
 
         const responseText = await response.text();
 
-        if (type == 'login' && response.status == 302 ||
-            type == 'signup' && response.status == 201) {
+        if ((type === 'login' && response.status === 302) ||
+            (type === 'signup' && response.status === 201)) {
             history.push('/days');
         } else {
             setError("error with " + type + "\n" + responseText);

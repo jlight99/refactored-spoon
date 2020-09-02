@@ -17,14 +17,17 @@ export default function Days() {
 
     useEffect(() => {
         fetchDays(user);
+        // disabled lint on next line because otherwise lint would complain about fetchDays being a missing dependency
+        // when in reality, fetchDays is a method defined separately underneath, since it is used in other places
+        // eslint-disable-next-line
     }, []);
 
     const fetchDays = async (user) => {
-        const responseJson = await getDays(user);
-        const filteredDay = getDayByDate(selectedDate, responseJson);
+        const responseJSON = await getDays(user);
+        const filteredDay = getDayByDate(selectedDate, responseJSON);
 
         setDay(filteredDay);
-        setDays(responseJson);
+        setDays(responseJSON);
     };
 
     const getDays = async (user) => {
@@ -35,16 +38,16 @@ export default function Days() {
                 'Content-Type': 'application/json',
             },
         });
-
-        return await response.json();
+        const responseJSON = await response.json();
+        return responseJSON;
     };
 
     const getDayByDate = (date, days) => {
         const filteredDays = days.filter(day => {
             const filterDate = new Date(day.Date);
-            return filterDate.getFullYear() == date.getFullYear() &&
-                filterDate.getMonth() == date.getMonth() &&
-                filterDate.getUTCDate() == date.getUTCDate();
+            return filterDate.getFullYear() === date.getFullYear() &&
+                filterDate.getMonth() === date.getMonth() &&
+                filterDate.getUTCDate() === date.getUTCDate();
         });
         return filteredDays[0];
     };
@@ -115,7 +118,7 @@ export default function Days() {
     return (
         <div>
             <MyNavbar />
-            <div>
+            <div style={{ margin: '10px' }}>
                 <DatePicker
                     selected={selectedDate}
                     onChange={handleSelectedDateChange}

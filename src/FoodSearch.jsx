@@ -27,8 +27,6 @@ export default function FoodSearch(props) {
     const [foodKeyword, setFoodKeyword] = useState('');
     const [searchResults, setSearchResults] = useState([]);
     const [foodDetails, setFoodDetails] = useState('');
-    const [foods, setFoods] = useState([]);
-    const [fdcIds, setFdcIds] = useState([]);
     // const [loadingDetails, setLoadingDetails] = useState(false);
 
     const handleSubmitSearch = async event => {
@@ -81,50 +79,9 @@ export default function FoodSearch(props) {
         viewDetails(result.FdcId);
     };
 
-    const addFood = (food, foodDetails) => {
-        const newFood = {
-            food: food,
-            foodDetails: foodDetails,
-        };
-        setFoods(foods => [...foods, newFood]);
-        setFdcIds(fdcIds => [...fdcIds, food.FdcId]);
-        if (props.addFood) {
-            props.addFood(newFood);
-        }
-    };
-
-    const removeFood = (garbageFdcId) => {
-        setFoods(foods.filter(food => food.food.FdcId != garbageFdcId));
-        setFdcIds(fdcIds.filter(fdcId => fdcId != garbageFdcId));
-        if (props.removeFood) {
-            props.removeFood(garbageFdcId);
-        }
-    };
-
-    const getCalories = (food) => {
-        return food?.foodDetails?.FoodNutrients?.filter((foodNutrient) => foodNutrient?.Nutrient.Id == NutrientIds.ENERGY)[0]?.Amount;
-    }
-
     return (
         <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
             <span style={{ flexDirection: 'column' }}>
-                {foods.map((food) => (
-                        <Card
-                            key={food.food.FdcId}
-                            style={{ width: '24rem', margin: '0 auto' }}
-                            className="mb-2"
-                        >
-                            <Card.Header>{food.food.FdcId}</Card.Header>
-                            <Card.Body>
-                                <Card.Text>
-                                    <span>FDC ID: {food.food.FdcId}</span><br />
-                                    <span>Description: {food.food.Description}</span><br />
-                                    <span>Calories: {getCalories(food)}</span>
-                                </Card.Text>
-                                <Button variant="danger" onClick={() => removeFood(food.food.FdcId)}>Remove</Button>
-                            </Card.Body>
-                        </Card>
-                    ))}
                 <Form inline onSubmit={handleSubmitSearch} style={{ margin: '10px' }}>
                     <FormControl
                         type="text"
@@ -174,10 +131,10 @@ export default function FoodSearch(props) {
                                                 </tbody>
                                             </Table>
                                         }
-                                        {!fdcIds.includes(result.FdcId) &&
-                                            <Button onClick={() => addFood(result, foodDetails)}>Select food</Button>
+                                        {props.showSelect && !props.fdcIds?.includes(result.FdcId) &&
+                                            <Button onClick={() => props.selectFood(result, foodDetails)}>Select food</Button>
                                         }
-                                        {fdcIds.includes(result.FdcId) &&
+                                        {props.showSelect && props.fdcIds?.includes(result.FdcId) &&
                                             <span style={{ 'color': 'green' }}>Food selected</span>
                                         }
                                     </Card.Body>
