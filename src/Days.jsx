@@ -86,15 +86,26 @@ export default function Days() {
             })
         });
 
-        const responseText = await response.text();
-        console.log(responseText);
-
         fetchDay(user, selectedDate);
         setShowAddMealForm(false);
     };
 
     const cancelAddMealForm = () => {
         setShowAddMealForm(false);
+    };
+
+    const deleteMeal = async (mealId) => {
+        const dateStr = selectedDate.getFullYear() + '-' + (selectedDate.getMonth() + 1) + '-' + selectedDate.getUTCDate();
+
+        const response = await fetch('http://localhost:8083/days/' + dateStr + '/meals/' + mealId + '?user=' + user, {
+            method: 'DELETE',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            },
+        });
+
+        fetchDay(user, selectedDate);
     };
 
     return (
@@ -129,7 +140,7 @@ export default function Days() {
                                     </span>
                                 ))}
                             </Card.Text>
-                            <Button variant="danger">
+                            <Button variant="danger" onClick={() => deleteMeal(meal.ID)}>
                                 <FontAwesomeIcon icon={faTrashAlt} />
                             </Button>
                         </Card.Body>
