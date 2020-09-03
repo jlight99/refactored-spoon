@@ -72,7 +72,7 @@ export default function FoodSearch(props) {
         responseJSON.forEach((result) => {
             const newUSDASearchResult = {
                 result: result,
-                details: foodsDetailResJSON.filter((detail) => detail.FdcId == result.FdcId)[0],
+                details: foodsDetailResJSON.filter((detail) => detail.FdcId === result.FdcId)[0],
             };
             usdaSearchResults.push(newUSDASearchResult);
         });

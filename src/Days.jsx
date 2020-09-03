@@ -3,6 +3,9 @@ import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
 import DatePicker from "react-datepicker";
 
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faTrashAlt } from '@fortawesome/free-solid-svg-icons'
+
 import "react-datepicker/dist/react-datepicker.css";
 import MyNavbar from './MyNavbar';
 import AddMealForm from './AddMealForm';
@@ -10,28 +13,25 @@ import AddMealForm from './AddMealForm';
 const user = "5f4552d03b8cd948cd803e7c";
 
 export default function Days() {
-    const [days, setDays] = useState([]);
     const [day, setDay] = useState();
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [showAddMealForm, setShowAddMealForm] = useState(false);
 
     useEffect(() => {
-        fetchDays(user);
+        fetchDay(user, selectedDate);
         // disabled lint on next line because otherwise lint would complain about fetchDays being a missing dependency
         // when in reality, fetchDays is a method defined separately underneath, since it is used in other places
         // eslint-disable-next-line
     }, []);
 
-    const fetchDays = async (user) => {
-        const responseJSON = await getDays(user);
-        const filteredDay = getDayByDate(selectedDate, responseJSON);
-
-        setDay(filteredDay);
-        setDays(responseJSON);
+    const fetchDay = async (user, date) => {
+        const fetchedDay = await getDay(user, date);
+        setDay(fetchedDay);
     };
 
-    const getDays = async (user) => {
-        const response = await fetch('http://localhost:8083/days?user=' + user, {
+    const getDay = async (user, date) => {
+        const dateStr = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getUTCDate();
+        const response = await fetch('http://localhost:8083/days/' + dateStr + '?user=' + user, { // TODO do NOT pass user as a path param, there should be some sort of session management
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
@@ -42,20 +42,10 @@ export default function Days() {
         return responseJSON;
     };
 
-    const getDayByDate = (date, days) => {
-        const filteredDays = days.filter(day => {
-            const filterDate = new Date(day.Date);
-            return filterDate.getFullYear() === date.getFullYear() &&
-                filterDate.getMonth() === date.getMonth() &&
-                filterDate.getUTCDate() === date.getUTCDate();
-        });
-        return filteredDays[0];
-    };
-
     const handleSelectedDateChange = (date) => {
         setSelectedDate(date);
-        const filteredDay = getDayByDate(date, days);
-        setDay(filteredDay);
+        fetchDay(user, date);
+        setShowAddMealForm(false);
     };
 
     const onAddFoodButtonClick = () => {
@@ -83,31 +73,23 @@ export default function Days() {
 
         const dateStr = selectedDate.getFullYear() + '-' + (selectedDate.getMonth() + 1) + '-' + selectedDate.getUTCDate();
 
-        const newMeals = day?.Meals;
-        if (day) {
-            newMeals.push(meal);
-        }
-
-        const response = await fetch('http://localhost:8083/day', {
-            method: day ? 'PUT' : 'POST',
+        const response = await fetch('http://localhost:8083/days/' + dateStr + '/meals?user=' + user, {
+            method: 'POST',
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                user: user,
-                date: dateStr,
-                meals: day ? newMeals : [meal],
-                nutrition: {
-                    calories: day ? day.Nutrition.Calories + meal.Nutrition.Calories : meal.Nutrition.Calories,
-                },
+                name: meal.Name,
+                foods: meal.Foods,
+                nutrition: meal.Nutrition,
             })
         });
 
         const responseText = await response.text();
         console.log(responseText);
 
-        fetchDays(user);
+        fetchDay(user, selectedDate);
         setShowAddMealForm(false);
     };
 
@@ -147,6 +129,9 @@ export default function Days() {
                                     </span>
                                 ))}
                             </Card.Text>
+                            <Button variant="danger">
+                                <FontAwesomeIcon icon={faTrashAlt} />
+                            </Button>
                         </Card.Body>
                         <div>
                             nutrition
