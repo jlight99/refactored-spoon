@@ -2,9 +2,7 @@ import React, { useState } from 'react';
 import Form from 'react-bootstrap/Form';
 import FormControl from 'react-bootstrap/FormControl';
 import Button from 'react-bootstrap/Button';
-import Accordion from 'react-bootstrap/Accordion';
 import Card from 'react-bootstrap/Card';
-// import Spinner from 'react-bootstrap/Spinner';
 import Table from 'react-bootstrap/Table';
 
 export const NutrientIds = {
@@ -26,15 +24,11 @@ export const NutrientIds = {
 export default function FoodSearch(props) {
     const [foodKeyword, setFoodKeyword] = useState('');
     const [searchResults, setSearchResults] = useState([]);
-    const [foodDetails, setFoodDetails] = useState('');
-    // const [loadingDetails, setLoadingDetails] = useState(false);
 
     const handleSubmitSearch = async event => {
         event.preventDefault();
 
-        const usdaSearchResults = await getUSDASearchResults(foodKeyword);
-
-        setSearchResults(usdaSearchResults);
+        await getUSDASearchResults(foodKeyword);
     };
 
     const getUSDASearchResults = async (keyword) => {
@@ -46,37 +40,48 @@ export default function FoodSearch(props) {
             },
             body: JSON.stringify({
                 food: keyword,
+                pageSize: "9",
             }),
         });
 
-        return await response.json();
-    };
+        const searchResultFdcIds = [];
 
-    const handleFoodKeywordChange = event => {
-        setFoodKeyword(event.target.value);
-    };
+        const responseJSON = await response.json();
+        responseJSON.forEach((result) => {
+            searchResultFdcIds.push(result.FdcId);
+        });
 
-    const viewDetails = async fdcId => {
-        // setLoadingDetails(true);
-        const response = await fetch('http://localhost:8082/food/detail', {
+        const totalPages = responseJSON.TotalPages;
+        console.log("totalPages");
+        console.log(totalPages);
+
+        const foodsDetailRes = await fetch('http://localhost:8082/foods/detail', {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                food: fdcId,
+                foods: searchResultFdcIds,
             }),
         });
 
-        const details = await response.json();
+        const foodsDetailResJSON = await foodsDetailRes.json();
 
-        setFoodDetails(details);
-        // setLoadingDetails(false);
+        const usdaSearchResults = [];
+        responseJSON.forEach((result) => {
+            const newUSDASearchResult = {
+                result: result,
+                details: foodsDetailResJSON.filter((detail) => detail.FdcId == result.FdcId)[0],
+            };
+            usdaSearchResults.push(newUSDASearchResult);
+        });
+
+        setSearchResults(usdaSearchResults);
     };
 
-    const handleAccordionClick = (result) => {
-        viewDetails(result.FdcId);
+    const handleFoodKeywordChange = event => {
+        setFoodKeyword(event.target.value);
     };
 
     return (
@@ -92,56 +97,45 @@ export default function FoodSearch(props) {
                     />
                     <Button type="submit">Search</Button>
                 </Form>
-                <div>
-                    <Accordion style={{ overflowY: 'scroll', maxHeight: '360px' }}>
-                        {searchResults && searchResults.map((result) => (
-                            <Card key={result.FdcId} onClick={() => handleAccordionClick(result)}>
-                                <Card.Header>
-                                    <Accordion.Toggle as={Button} variant="link" eventKey={result.FdcId}>
-                                        {result.Description}
-                                    </Accordion.Toggle>
-                                </Card.Header>
-                                <Accordion.Collapse eventKey={result.FdcId}>
-                                    <Card.Body>
-                                        {/* {loadingDetails &&
-                                                <Spinner animation="border" role="status">
-                                                    <span className="sr-only">Loading...</span>
-                                                </Spinner>
-                                            } */}
-                                            Brand: {result.BrandOwner}<br />
-                                            Ingredients: {result.Ingredients}<br />
-                                            FdcId: {result.FdcId}<br />
-                                        {foodDetails &&
-                                            /* {!loadingDetails && foodDetails && */
-                                            <Table>
-                                                <thead>
-                                                    <tr>
-                                                        <th>Nutrient</th>
-                                                        <th>Amount (per 100 grams)</th>
+                <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center' }}>
+                    {searchResults && searchResults.map((searchResult) => (
+                        <Card key={searchResult.result.FdcId} border="primary" style={{ width: '30%', margin: '10px' }}>
+                            <Card.Header>
+                                {searchResult.result.Description}
+                            </Card.Header>
+                            <Card.Body>
+                                FdcId: {searchResult.result.FdcId}<br />
+                                {searchResult.result.BrandOwner && <span>Brand: {searchResult.result.BrandOwner}</span>}<br />
+                                {searchResult.result.Ingredients && <span>Ingredients: {searchResult.result.Ingredients}</span>}<br />
+
+                                {searchResult.details &&
+                                        <Table style={{ marginTop: '5px' }}>
+                                            <thead>
+                                                <tr>
+                                                    <th>Nutrient</th>
+                                                    <th>Amount (per 100 grams)</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {searchResult.details.FoodNutrients.filter((foodNutrient) => [NutrientIds.ENERGY, NutrientIds.PROTEIN, NutrientIds.CARBOHYDRATE, NutrientIds.FAT].includes(foodNutrient.Nutrient.Id)
+                                                ).map((foodNutrient) => (
+                                                    <tr key={foodNutrient.Id}>
+                                                        <td>{foodNutrient.Nutrient.Name}</td>
+                                                        <td>{foodNutrient.Amount} {foodNutrient.Nutrient.UnitName}</td>
                                                     </tr>
-                                                </thead>
-                                                <tbody>
-                                                    {foodDetails.FoodNutrients.filter((foodNutrient) => [NutrientIds.ENERGY, NutrientIds.PROTEIN, NutrientIds.CARBOHYDRATE, NutrientIds.FAT].includes(foodNutrient.Nutrient.Id)
-                                                    ).map((foodNutrient) => (
-                                                        <tr key={foodNutrient.Id}>
-                                                            <td>{foodNutrient.Nutrient.Name}</td>
-                                                            <td>{foodNutrient.Amount} {foodNutrient.Nutrient.UnitName}</td>
-                                                        </tr>
-                                                    ))}
-                                                </tbody>
-                                            </Table>
-                                        }
-                                        {props.showSelect && !props.fdcIds?.includes(result.FdcId) &&
-                                            <Button onClick={() => props.selectFood(result, foodDetails)}>Select food</Button>
-                                        }
-                                        {props.showSelect && props.fdcIds?.includes(result.FdcId) &&
-                                            <span style={{ 'color': 'green' }}>Food selected</span>
-                                        }
-                                    </Card.Body>
-                                </Accordion.Collapse>
-                            </Card>
-                        ))}
-                    </Accordion>
+                                                ))}
+                                            </tbody>
+                                        </Table>
+                                    }
+                                    {props.showSelect && !props.fdcIds?.includes(searchResult.result.FdcId) &&
+                                        <Button onClick={() => props.selectFood(searchResult.result, searchResult.details)}>Select food</Button>
+                                    }
+                                    {props.showSelect && props.fdcIds?.includes(searchResult.result.FdcId) &&
+                                        <span style={{ 'color': 'green' }}>Food selected</span>
+                                    }
+                            </Card.Body>
+                        </Card>
+                    ))}
                 </div>
             </span>
         </div>

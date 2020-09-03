@@ -161,7 +161,7 @@ export default function Days() {
                 </div>
             </div>}
             {!day && <div>no data for this date</div>}
-            {!showAddMealForm && <Button onClick={onAddFoodButtonClick}>Add food</Button>}
+            {!showAddMealForm && <Button onClick={onAddFoodButtonClick}>Add meal</Button>}
             {showAddMealForm && <AddMealForm
                 submit={submitAddMealForm}
                 cancel={cancelAddMealForm}

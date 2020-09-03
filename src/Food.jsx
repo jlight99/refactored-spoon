@@ -13,7 +13,7 @@ export default function Food(props) {
 
     return (
         <Card
-            style={{ width: '24rem', margin: '0 auto' }}
+            style={{ width: '30%', margin: '10px' }}
             className="mb-2"
         >
             <Card.Header>{props.food.fdcId}</Card.Header>

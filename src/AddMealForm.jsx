@@ -111,31 +111,33 @@ export default function AddMealForm(props) {
                     </Dropdown>
 
                     <div>Foods:</div>
-                    {foods.map((food) => {
-                        return (
-                            <Food
-                                key={food.fdcId}
-                                food={food}
-                                updateServingSize={updateServingSize}
-                                removeFood={removeFood}
-                            />
-                        );
-                    })}
-
-                    <FoodSearch
-                        selectFood={addFood}
-                        showSelect
-                        fdcIds={fdcIds}
-                    />
+                    <span style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center' }}>
+                        {foods.map((food) => {
+                            return (
+                                <Food
+                                    key={food.fdcId}
+                                    food={food}
+                                    updateServingSize={updateServingSize}
+                                    removeFood={removeFood}
+                                />
+                            );
+                        })}
+                    </span>
 
                     <div style={{ paddingTop: '20px' }}>
                         <Button variant="secondary" type="button" onClick={props.cancel} style={{ marginRight: '5px' }}>
                             Cancel
                         </Button>
                         <Button variant="primary" type="submit" onClick={handleSubmit}>
-                            Submit
+                            Add Meal
                         </Button>
                     </div>
+
+                    <FoodSearch
+                        selectFood={addFood}
+                        showSelect
+                        fdcIds={fdcIds}
+                    />
                 </div>
             </div>
         </div>
