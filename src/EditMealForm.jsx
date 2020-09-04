@@ -82,11 +82,19 @@ export default function EditMealForm(props) {
         setMealCalories((mealCalories + newFood.nutrition.calories));
     };
 
-    const removeFood = (garbageFdcId) => {
+    const removeFoodFromAddForm = (garbageFdcId) => {
+        const removedFood = foods.filter(food => food.fdcId === garbageFdcId)[0];
+
         setFoods(foods.filter(food => food.fdcId !== garbageFdcId));
         setFdcIds(fdcIds.filter(fdcId => fdcId !== garbageFdcId));
 
-        const removedFood = foods.filter(food => food.fdcId === garbageFdcId)[0];
+        setMealCalories((mealCalories - removedFood.nutrition.calories));
+    };
+
+    const removeFoodFromEditForm = (garbageId) => {
+        const removedFood = foods.filter(food => food._id === garbageId)[0];
+        setFoods(foods.filter(food => food._id !== garbageId));
+
         setMealCalories((mealCalories - removedFood.nutrition.calories));
     };
 
@@ -112,10 +120,10 @@ export default function EditMealForm(props) {
                     <span style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center' }}>
                         {foods.map((food) => (
                             <Food
-                                key={food.fdcId}
+                                key={food._id ? food._id : food.fdcId}
                                 food={food}
                                 updateServingSize={updateServingSize}
-                                removeFood={removeFood}
+                                removeFood={props.meal ? removeFoodFromEditForm : removeFoodFromAddForm}
                             />
                         ))}
                     </span>

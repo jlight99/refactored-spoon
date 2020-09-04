@@ -76,9 +76,6 @@ export default function Days() {
     const submitEditMealForm = async (meal) => {
         const dateStr = selectedDate.getFullYear() + '-' + (selectedDate.getMonth() + 1) + '-' + selectedDate.getUTCDate();
 
-        console.log("update endpoint");
-        console.log('http://localhost:8083/days/' + dateStr + '/meals/' + meal._id + '?user=' + user);
-
         await fetch('http://localhost:8083/days/' + dateStr + '/meals/' + meal._id + '?user=' + user, {
             method: 'PUT',
             headers: {

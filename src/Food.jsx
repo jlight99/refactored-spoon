@@ -29,7 +29,7 @@ export default function Food(props) {
                         g
                     </span><br />
                 </Card.Text>
-                <Button variant="danger" onClick={() => props.removeFood(props.food.fdcId)}>Remove</Button>
+                <Button variant="danger" onClick={() => props.removeFood(props.food._id ? props.food._id : props.food.fdcId)}>Remove</Button>
             </Card.Body>
         </Card>
     );
