@@ -12,10 +12,10 @@ export default function Food(props) {
             <Card.Header>{props.food.fdcId}</Card.Header>
             <Card.Body>
                 <Card.Text>
-                    {props.food.fdcId && <br><span style={{ margin: '5px' }}>FDC ID: {props.food.fdcId}</span></br>}
-                    {props.food.name && <br><span style={{ margin: '5px' }}>Name: {props.food.name}</span></br>}
-                    {props.food.details && <br><span style={{ margin: '5px' }}>Description: {props.food.details.description}</span></br>}
-                    <br><span style={{ margin: '5px' }}>Calories: {props.food.nutrition.calories}</span></br>
+                    {props.food.fdcId && <span style={{ margin: '5px' }}>FDC ID: {props.food.fdcId}<br /></span>}
+                    {props.food.name && <span style={{ margin: '5px' }}>Name: {props.food.name}<br /></span>}
+                    {props.food.details && <span style={{ margin: '5px' }}>Description: {props.food.details.description}<br /></span>}
+                    <span style={{ margin: '5px' }}>Calories: {props.food.nutrition.calories}<br /></span>
 
                     <span>
                         Serving size:
