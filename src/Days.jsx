@@ -6,6 +6,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import MyNavbar from './MyNavbar';
 import EditMealForm from './EditMealForm';
 import Meal from './Meal';
+import NutritionTable, { checkNutritionExists } from './NutritionTable';
 
 const user = "5f4552d03b8cd948cd803e7c";
 
@@ -133,8 +134,12 @@ export default function Days() {
                 ))}
                 </div>
                 <div>
-                    nutrition
-                    <div>calories: {day?.nutrition?.calories}</div>
+                    {checkNutritionExists(day.nutrition) &&
+                        <span>
+                            Nutrition summary of the day
+                            <NutritionTable nutrition={day.nutrition} />
+                        </span>
+                    }
                 </div>
             </div>}
             {!day && <div>no data for this date</div>}

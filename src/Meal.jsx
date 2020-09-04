@@ -2,8 +2,11 @@ import React from 'react';
 import Card from 'react-bootstrap/Card';
 import Button from 'react-bootstrap/Button';
 
+import NutritionTable, { checkNutritionExists } from './NutritionTable';
+
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faTrashAlt, faEdit } from '@fortawesome/free-solid-svg-icons'
+import Food from './Food';
 
 export default function Meal(props) {
     return (
@@ -22,22 +25,16 @@ export default function Meal(props) {
             </Card.Header>
             <Card.Body>
                 <Card.Text>
-                    {props.meal.foods.map((food, k) => (
+                    {props.meal?.foods?.map((food, k) => (
                         <span key={k}>
-                            {food.name}<br />
-                            {<span>
-                                group: {food.group}<br />
-                                serving: {food.serving}<br />
-                                calories: {food?.nutrition?.calories}<br />
-                            </span>}
-                            <br />
+                            <Food food={food} />
                         </span>
                     ))}
                 </Card.Text>
             </Card.Body>
             <div>
-                nutrition
-                <div>calories: {props.meal?.nutrition?.calories}</div>
+                Meal nutrition
+                {checkNutritionExists(props.meal?.nutrition) && <NutritionTable nutrition={props.meal.nutrition} />}
             </div>
         </Card>
     );
