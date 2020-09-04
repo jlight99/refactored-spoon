@@ -1,16 +1,9 @@
-import React, { useState } from 'react';
+import React from 'react';
 import Card from 'react-bootstrap/Card';
 import FormControl from 'react-bootstrap/FormControl';
 import Button from 'react-bootstrap/Button';
 
 export default function Food(props) {
-    const [servingSize, setServingSize] = useState(props.food.serving);
-
-    const updateServingSize = (newServingSize) => {
-        setServingSize(newServingSize);
-        props.updateServingSize(props.food, newServingSize)
-    }
-
     return (
         <Card
             style={{ width: '30%', margin: '10px' }}
@@ -19,19 +12,19 @@ export default function Food(props) {
             <Card.Header>{props.food.fdcId}</Card.Header>
             <Card.Body>
                 <Card.Text>
-                    <span style={{ margin: '5px' }}>FDC ID: {props.food.fdcId}</span><br />
-                    <span style={{ margin: '5px' }}>Description: {props.food.details.Description}</span><br />
-                    <span style={{ margin: '5px' }}>Calories: {props.food.nutrition.calories}</span><br />
+                    {props.food.fdcId && <br><span style={{ margin: '5px' }}>FDC ID: {props.food.fdcId}</span></br>}
+                    {props.food.name && <br><span style={{ margin: '5px' }}>Name: {props.food.name}</span></br>}
+                    {props.food.details && <br><span style={{ margin: '5px' }}>Description: {props.food.details.description}</span></br>}
+                    <br><span style={{ margin: '5px' }}>Calories: {props.food.nutrition.calories}</span></br>
 
                     <span>
                         Serving size:
                         <FormControl
                             type="number"
                             placeholder={100}
-                            // className="mr-sm-2"
                             style={{ width: '80px', display: 'inline-block', margin: '5px' }}
-                            value={servingSize}
-                            onChange={(e) => updateServingSize(e.target.value)}
+                            value={props.food.serving}
+                            onChange={(e) => props.updateServingSize(props.food, e.target.value)}
                         />
                         g
                     </span><br />

@@ -11,10 +11,10 @@ const mealOptions = [
     { value: 'dinner', label: 'Dinner' }
 ]
 
-export default function AddMealForm(props) {
-    const [foods, setFoods] = useState([]);
-    const [mealName, setMealName] = useState('');
-    const [mealCalories, setMealCalories] = useState(0);
+export default function EditMealForm(props) {
+    const [foods, setFoods] = useState(props.meal?.foods ? props.meal.foods : []);
+    const [mealName, setMealName] = useState(props.meal?.name ? props.meal.name : '');
+    const [mealCalories, setMealCalories] = useState(props.meal?.nutrition.calories ? props.meal.nutrition.calories : 0);
     const [fdcIds, setFdcIds] = useState([]);
 
     const updateMealCalories = () => {
@@ -28,32 +28,30 @@ export default function AddMealForm(props) {
     const handleSubmit = event => {
         event.preventDefault();
         const formattedFoods = foods.map((food) => {
-            const formattedFood = {
-                name: food.details.Description,
-                group: "food group",
-                serving: food.serving,
-                nutrition: {
-                    calories: food.nutrition.calories,
-                },
-            };
-            return formattedFood;
+            food.name = food.name ? food.name : food.details.description;
+            return food;
         });
         const meal = {
+            _id: props.meal?._id,
             name: mealName,
             foods: formattedFoods,
             nutrition: {
                 calories: mealCalories,
             },
         };
-
         props.submit(meal);
     };
 
+    // need to store base cal / 100 in food somewhere
     const updateServingSize = (food, newServingSize) => {
         const newFoods = foods.map((oldFood) => {
-            if (oldFood.fdcId === food.fdcId) {
+            const updatedCals = Math.round(oldFood.nutrition.calories / oldFood.serving * newServingSize);
+            const isMatch = food._id ? oldFood._id === food._id : oldFood.fdcId === food.fdcId;
+            if (isMatch) {
                 food.serving = parseInt(newServingSize);
-                food.nutrition.calories = getCalories(food.details, newServingSize);
+                food.nutrition = {
+                    calories: updatedCals,
+                };
                 return food;
             }
             return oldFood;
@@ -62,26 +60,26 @@ export default function AddMealForm(props) {
         updateMealCalories();
     };
 
-    const getCalories = (foodDetails, serving = 100) => {
-        const standardServingCalories = foodDetails?.FoodNutrients?.filter((foodNutrient) => foodNutrient?.Nutrient.Id === NutrientIds.ENERGY)[0]?.Amount;
+    const getCaloriesFromFoodDetails = (foodDetails, serving = 100) => {
+        const standardServingCalories = foodDetails?.foodNutrients?.filter((foodNutrient) => foodNutrient?.nutrient.id === NutrientIds.ENERGY)[0]?.amount;
         return Math.round(standardServingCalories / 100 * serving);
     };
 
     const addFood = (food, foodDetails) => {
         const newFood = {
-            brand: food.BrandOwner,
-            ingredients: food.Ingredients,
-            fdcId: food.FdcId,
+            brand: food.brandOwner,
+            ingredients: food.ingredients,
+            fdcId: food.fdcId,
             serving: 100,
             nutrition: {
-                calories: getCalories(foodDetails),
+                calories: getCaloriesFromFoodDetails(foodDetails),
             },
             details: foodDetails,
         };
         setFoods(foods => [...foods, newFood]);
-        setFdcIds(fdcIds => [...fdcIds, food.FdcId]);
+        setFdcIds(fdcIds => [...fdcIds, food.fdcId]);
 
-        setMealCalories(mealCalories + newFood.nutrition.calories);
+        setMealCalories((mealCalories + newFood.nutrition.calories));
     };
 
     const removeFood = (garbageFdcId) => {
@@ -89,7 +87,7 @@ export default function AddMealForm(props) {
         setFdcIds(fdcIds.filter(fdcId => fdcId !== garbageFdcId));
 
         const removedFood = foods.filter(food => food.fdcId === garbageFdcId)[0];
-        setMealCalories(mealCalories - removedFood.nutrition.calories);
+        setMealCalories((mealCalories - removedFood.nutrition.calories));
     };
 
     return (
@@ -112,16 +110,14 @@ export default function AddMealForm(props) {
 
                     <div>Foods:</div>
                     <span style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center' }}>
-                        {foods.map((food) => {
-                            return (
-                                <Food
-                                    key={food.fdcId}
-                                    food={food}
-                                    updateServingSize={updateServingSize}
-                                    removeFood={removeFood}
-                                />
-                            );
-                        })}
+                        {foods.map((food) => (
+                            <Food
+                                key={food.fdcId}
+                                food={food}
+                                updateServingSize={updateServingSize}
+                                removeFood={removeFood}
+                            />
+                        ))}
                     </span>
 
                     <div style={{ paddingTop: '20px' }}>
@@ -129,7 +125,8 @@ export default function AddMealForm(props) {
                             Cancel
                         </Button>
                         <Button variant="primary" type="submit" onClick={handleSubmit}>
-                            Add Meal
+                            {!props.meal && 'Add Meal'}
+                            {props.meal && 'Update Meal'}
                         </Button>
                     </div>
 

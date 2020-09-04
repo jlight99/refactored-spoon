@@ -48,7 +48,7 @@ export default function FoodSearch(props) {
 
         const responseJSON = await response.json();
         responseJSON.forEach((result) => {
-            searchResultFdcIds.push(result.FdcId);
+            searchResultFdcIds.push(result.fdcId);
         });
 
         const totalPages = responseJSON.TotalPages;
@@ -72,7 +72,7 @@ export default function FoodSearch(props) {
         responseJSON.forEach((result) => {
             const newUSDASearchResult = {
                 result: result,
-                details: foodsDetailResJSON.filter((detail) => detail.FdcId === result.FdcId)[0],
+                details: foodsDetailResJSON.filter((detail) => detail.fdcId === result.fdcId)[0],
             };
             usdaSearchResults.push(newUSDASearchResult);
         });
@@ -99,14 +99,14 @@ export default function FoodSearch(props) {
                 </Form>
                 <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center' }}>
                     {searchResults && searchResults.map((searchResult) => (
-                        <Card key={searchResult.result.FdcId} border="primary" style={{ width: '30%', margin: '10px' }}>
+                        <Card key={searchResult.result.fdcId} border="primary" style={{ width: '30%', margin: '10px' }}>
                             <Card.Header>
-                                {searchResult.result.Description}
+                                {searchResult.result.description}
                             </Card.Header>
                             <Card.Body>
-                                FdcId: {searchResult.result.FdcId}<br />
-                                {searchResult.result.BrandOwner && <span>Brand: {searchResult.result.BrandOwner}</span>}<br />
-                                {searchResult.result.Ingredients && <span>Ingredients: {searchResult.result.Ingredients}</span>}<br />
+                                FdcId: {searchResult.result.fdcId}<br />
+                                {searchResult.result.brandOwner && <span>Brand: {searchResult.result.brandOwner}</span>}<br />
+                                {searchResult.result.ingredients && <span>Ingredients: {searchResult.result.ingredients}</span>}<br />
 
                                 {searchResult.details &&
                                         <Table style={{ marginTop: '5px' }}>
@@ -117,20 +117,20 @@ export default function FoodSearch(props) {
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                {searchResult.details.FoodNutrients.filter((foodNutrient) => [NutrientIds.ENERGY, NutrientIds.PROTEIN, NutrientIds.CARBOHYDRATE, NutrientIds.FAT].includes(foodNutrient.Nutrient.Id)
+                                                {searchResult.details.foodNutrients.filter((foodNutrient) => [NutrientIds.ENERGY, NutrientIds.PROTEIN, NutrientIds.CARBOHYDRATE, NutrientIds.FAT].includes(foodNutrient.nutrient.id)
                                                 ).map((foodNutrient) => (
-                                                    <tr key={foodNutrient.Id}>
-                                                        <td>{foodNutrient.Nutrient.Name}</td>
-                                                        <td>{foodNutrient.Amount} {foodNutrient.Nutrient.UnitName}</td>
+                                                    <tr key={foodNutrient.id}>
+                                                        <td>{foodNutrient.nutrient.name}</td>
+                                                        <td>{foodNutrient.amount} {foodNutrient.nutrient.unitName}</td>
                                                     </tr>
                                                 ))}
                                             </tbody>
                                         </Table>
                                     }
-                                    {props.showSelect && !props.fdcIds?.includes(searchResult.result.FdcId) &&
+                                    {props.showSelect && !props.fdcIds?.includes(searchResult.result.fdcId) &&
                                         <Button onClick={() => props.selectFood(searchResult.result, searchResult.details)}>Select food</Button>
                                     }
-                                    {props.showSelect && props.fdcIds?.includes(searchResult.result.FdcId) &&
+                                    {props.showSelect && props.fdcIds?.includes(searchResult.result.fdcId) &&
                                         <span style={{ 'color': 'green' }}>Food selected</span>
                                     }
                             </Card.Body>
