@@ -3,7 +3,10 @@ import SignInForm from './SignInForm';
 import Tabs from 'react-bootstrap/Tabs';
 import Tab from 'react-bootstrap/Tab';
 import { useHistory } from "react-router-dom";
-import GoogleLogin from 'react-google-login';
+
+export function getUserFromLocalStorage() {
+    return localStorage.getItem('currentUser');
+}
 
 export default function SignIn() {
     const history = useHistory();
@@ -27,6 +30,8 @@ export default function SignIn() {
 
         if ((type === 'login' && response.status === 302) ||
             (type === 'signup' && response.status === 201)) {
+            localStorage.setItem('currentUser', JSON.stringify(responseText));
+            getUserFromLocalStorage();
             history.push('/days');
         } else {
             setError("error with " + type + "\n" + responseText);
@@ -39,18 +44,6 @@ export default function SignIn() {
 
     const handleSignupSubmit = (email, password) => {
         handleSubmit(email, password, 'signup');
-    };
-
-    const googleSignup = (res, type) => {
-        const googleResponse = {
-            Name: res.profileObj.name,
-            email: res.profileObj.email,
-            token: res.googleId,
-            Image: res.profileObj.imageUrl,
-            ProviderId: 'Google'
-        };
-
-        handleSubmit(googleResponse.email, googleResponse.token, type);
     };
 
     return (
@@ -67,24 +60,14 @@ export default function SignIn() {
                     <SignInForm
                         handleSubmit={handleLoginSubmit}
                     />
-                    <GoogleLogin
-                        clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID}
-                        buttonText="Login with Google"
-                        onSuccess={res => googleSignup(res, 'login')}
-                        onFailure={res => googleSignup(res, 'login')} />
                 </Tab>
                 <Tab eventKey="signup" title="Sign Up">
                     <SignInForm
                         handleSubmit={handleSignupSubmit}
                     />
-                    <GoogleLogin
-                        clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID}
-                        buttonText="Login with Google"
-                        onSuccess={res => googleSignup(res, 'signup')}
-                        onFailure={res => googleSignup(res, 'signup')} />
                 </Tab>
             </Tabs>
-            {error && <div style={{ color: "red" }}>error!</div>}
+            {error && <div style={{ color: "red" }}>sign in unsuccessful :(</div>}
         </div>
     );
 }

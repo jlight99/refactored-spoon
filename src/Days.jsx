@@ -7,8 +7,9 @@ import MyNavbar from './MyNavbar';
 import EditMealForm from './EditMealForm';
 import Meal from './Meal';
 import NutritionTable, { checkNutritionExists } from './NutritionTable';
+import { getUserFromLocalStorage } from './SignIn';
 
-const user = "5f4552d03b8cd948cd803e7c";
+const user = getUserFromLocalStorage();
 
 export default function Days() {
     const [day, setDay] = useState();

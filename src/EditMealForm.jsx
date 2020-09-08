@@ -75,19 +75,19 @@ export default function EditMealForm(props) {
             if (isMatch) {
                 food.serving = parseInt(newServingSize);
                 food.nutrition = {
-                    calories: getRoundedNutrient(oldFood.usdaNutrition.calories, newServingSize),
-                    protein: getRoundedNutrient(oldFood.usdaNutrition.protein, newServingSize),
-                    carbs: getRoundedNutrient(oldFood.usdaNutrition.carbs, newServingSize),
-                    fat: getRoundedNutrient(oldFood.usdaNutrition.fat, newServingSize),
-                    sugar: getRoundedNutrient(oldFood.usdaNutrition.sugar, newServingSize),
-                    fiber: getRoundedNutrient(oldFood.usdaNutrition.fiber, newServingSize),
-                    sodium: getRoundedNutrient(oldFood.usdaNutrition.sodium, newServingSize),
-                    calcium: getRoundedNutrient(oldFood.usdaNutrition.calcium, newServingSize),
-                    iron: getRoundedNutrient(oldFood.usdaNutrition.iron, newServingSize),
-                    cholesterol: getRoundedNutrient(oldFood.usdaNutrition.cholesterol, newServingSize),
-                    potassium: getRoundedNutrient(oldFood.usdaNutrition.potassium, newServingSize),
-                    vitaminA: getRoundedNutrient(oldFood.usdaNutrition.vitaminA, newServingSize),
-                    vitaminC: getRoundedNutrient(oldFood.usdaNutrition.vitaminC, newServingSize),
+                    calories: getRoundedWholeNutrient(oldFood.usdaNutrition.calories, newServingSize),
+                    protein: getRounded2DecNutrient(oldFood.usdaNutrition.protein, newServingSize),
+                    carbs: getRounded2DecNutrient(oldFood.usdaNutrition.carbs, newServingSize),
+                    fat: getRounded2DecNutrient(oldFood.usdaNutrition.fat, newServingSize),
+                    sugar: getRounded2DecNutrient(oldFood.usdaNutrition.sugar, newServingSize),
+                    fiber: getRounded2DecNutrient(oldFood.usdaNutrition.fiber, newServingSize),
+                    sodium: getRoundedWholeNutrient(oldFood.usdaNutrition.sodium, newServingSize),
+                    calcium: getRoundedWholeNutrient(oldFood.usdaNutrition.calcium, newServingSize),
+                    iron: getRounded2DecNutrient(oldFood.usdaNutrition.iron, newServingSize),
+                    cholesterol: getRoundedWholeNutrient(oldFood.usdaNutrition.cholesterol, newServingSize),
+                    potassium: getRoundedWholeNutrient(oldFood.usdaNutrition.potassium, newServingSize),
+                    vitaminA: getRounded2DecNutrient(oldFood.usdaNutrition.vitaminA, newServingSize),
+                    vitaminC: getRounded2DecNutrient(oldFood.usdaNutrition.vitaminC, newServingSize),
                 };
                 return food;
             }
@@ -97,8 +97,12 @@ export default function EditMealForm(props) {
         updateMealNutrition();
     };
 
-    const getRoundedNutrient = (nutrient, servingSize) => {
+    const getRounded2DecNutrient = (nutrient, servingSize) => {
         return Math.round(nutrient * servingSize) / 100;
+    };
+
+    const getRoundedWholeNutrient = (nutrient, servingSize) => {
+        return Math.round(nutrient / 100 * servingSize);
     };
 
     const addFood = (food, foodDetails) => {

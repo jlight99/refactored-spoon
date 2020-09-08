@@ -9,18 +9,25 @@ import {
 } from "react-router-dom";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import FoodSearchPage from './FoodSearchPage';
+import { getUserFromLocalStorage } from './SignIn';
 
 function App() {
   return (
     <div className="App">
       <Router>
         <div>
-          <Route exact path="/">
-            <Redirect to="/signin" />
-          </Route>
           <Route path="/signin" component={SignIn} />
-          <Route path="/days" component={Days} />
-          <Route path="/foodsearch" component={FoodSearchPage} />
+          {!getUserFromLocalStorage() &&
+            <span>
+              <Redirect to="/signin" />
+            </span>
+          }
+          {getUserFromLocalStorage() &&
+            <span>
+              <Route path="/days" component={Days} />
+              <Route path="/foodsearch" component={FoodSearchPage} />
+            </span>
+          }
         </div>
       </Router>
     </div>
