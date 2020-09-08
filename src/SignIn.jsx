@@ -14,7 +14,7 @@ export default function SignIn() {
     const [error, setError] = useState('');
 
     const handleSubmit = async (email, password, type) => {
-        const response = await fetch('http://localhost:8081/' + type, {
+        const response = await fetch('https://shielded-earth-02834.herokuapp.com/' + type, {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
