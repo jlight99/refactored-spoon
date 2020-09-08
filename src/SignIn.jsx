@@ -8,7 +8,7 @@ export function getUserFromLocalStorage() {
     return localStorage.getItem('currentUser');
 }
 
-export default function SignIn() {
+export default function SignIn(props) {
     const history = useHistory();
     const [key, setKey] = useState('login');
     const [error, setError] = useState('');
@@ -31,7 +31,7 @@ export default function SignIn() {
         if ((type === 'login' && response.status === 302) ||
             (type === 'signup' && response.status === 201)) {
             localStorage.setItem('currentUser', JSON.stringify(responseText));
-            getUserFromLocalStorage();
+            props.setAuthenticated(true);
             history.push('/days');
         } else {
             setError("error with " + type + "\n" + responseText);

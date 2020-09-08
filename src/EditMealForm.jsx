@@ -236,6 +236,12 @@ export default function EditMealForm(props) {
                         ))}
                     </span>
 
+                    <FoodSearch
+                        selectFood={addFood}
+                        showSelect
+                        fdcIds={fdcIds}
+                    />
+
                     <div style={{ paddingTop: '20px' }}>
                         <Button variant="secondary" type="button" onClick={props.cancel} style={{ marginRight: '5px' }}>
                             Cancel
@@ -245,12 +251,6 @@ export default function EditMealForm(props) {
                             {props.meal && 'Update Meal'}
                         </Button>
                     </div>
-
-                    <FoodSearch
-                        selectFood={addFood}
-                        showSelect
-                        fdcIds={fdcIds}
-                    />
                 </div>
             </div>
         </div>

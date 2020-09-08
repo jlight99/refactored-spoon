@@ -9,29 +9,29 @@ import Meal from './Meal';
 import NutritionTable, { checkNutritionExists } from './NutritionTable';
 import { getUserFromLocalStorage } from './SignIn';
 
-const user = getUserFromLocalStorage();
-
-export default function Days() {
+export default function Days(props) {
     const [day, setDay] = useState();
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [showAddMealForm, setShowAddMealForm] = useState(false);
     const [editMeal, setEditMeal] = useState('');
 
     useEffect(() => {
-        fetchDay(user, selectedDate);
+        console.log("Days useEffect");
+        console.log(getUserFromLocalStorage());
+        fetchDay(selectedDate);
         // disabled lint on next line because otherwise lint would complain about fetchDays being a missing dependency
         // when in reality, fetchDays is a method defined separately underneath, since it is used in other places
         // eslint-disable-next-line
     }, []);
 
-    const fetchDay = async (user, date) => {
-        const fetchedDay = await getDay(user, date);
+    const fetchDay = async (date) => {
+        const fetchedDay = await getDay(date);
         setDay(fetchedDay);
     };
 
-    const getDay = async (user, date) => {
+    const getDay = async (date) => {
         const dateStr = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getUTCDate();
-        const response = await fetch('https://shielded-earth-02834.herokuapp.com/days/' + dateStr + '?user=' + user, { // TODO do NOT pass user as a path param, there should be some sort of session management
+        const response = await fetch('https://shielded-earth-02834.herokuapp.com/days/' + dateStr + '?user=' + getUserFromLocalStorage(), {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
@@ -47,7 +47,7 @@ export default function Days() {
 
     const handleSelectedDateChange = (date) => {
         setSelectedDate(date);
-        fetchDay(user, date);
+        fetchDay(date);
         setShowAddMealForm(false);
     };
 
@@ -58,7 +58,7 @@ export default function Days() {
     const submitAddMealForm = async (meal) => {
         const dateStr = selectedDate.getFullYear() + '-' + (selectedDate.getMonth() + 1) + '-' + selectedDate.getUTCDate();
 
-        await fetch('https://shielded-earth-02834.herokuapp.com/days/' + dateStr + '/meals?user=' + user, {
+        await fetch('https://shielded-earth-02834.herokuapp.com/days/' + dateStr + '/meals?user=' + getUserFromLocalStorage(), {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -67,7 +67,7 @@ export default function Days() {
             body: JSON.stringify(meal),
         });
 
-        fetchDay(user, selectedDate);
+        fetchDay(selectedDate);
         setShowAddMealForm(false);
     };
 
@@ -78,7 +78,7 @@ export default function Days() {
     const submitEditMealForm = async (meal) => {
         const dateStr = selectedDate.getFullYear() + '-' + (selectedDate.getMonth() + 1) + '-' + selectedDate.getUTCDate();
 
-        await fetch('https://shielded-earth-02834.herokuapp.com/days/' + dateStr + '/meals/' + meal._id + '?user=' + user, {
+        await fetch('https://shielded-earth-02834.herokuapp.com/days/' + dateStr + '/meals/' + meal._id + '?user=' + getUserFromLocalStorage(), {
             method: 'PUT',
             headers: {
                 'Accept': 'application/json',
@@ -87,14 +87,14 @@ export default function Days() {
             body: JSON.stringify(meal),
         });
 
-        fetchDay(user, selectedDate);
+        fetchDay(selectedDate);
         setEditMeal('');
     };
 
     const deleteMeal = async (mealId) => {
         const dateStr = selectedDate.getFullYear() + '-' + (selectedDate.getMonth() + 1) + '-' + selectedDate.getUTCDate();
 
-        await fetch('https://shielded-earth-02834.herokuapp.com/days/' + dateStr + '/meals/' + mealId + '?user=' + user, {
+        await fetch('https://shielded-earth-02834.herokuapp.com/days/' + dateStr + '/meals/' + mealId + '?user=' + getUserFromLocalStorage(), {
             method: 'DELETE',
             headers: {
                 'Accept': 'application/json',
@@ -102,7 +102,7 @@ export default function Days() {
             },
         });
 
-        fetchDay(user, selectedDate);
+        fetchDay(selectedDate);
     };
 
     const updateMeal = (meal) => {
@@ -115,16 +115,29 @@ export default function Days() {
 
     return (
         <div>
-            <MyNavbar />
+            <MyNavbar setAuthenticated={props.setAuthenticated} />
             <div style={{ margin: '10px' }}>
                 <DatePicker
                     selected={selectedDate}
                     onChange={handleSelectedDateChange}
                 />
             </div>
+            {showAddMealForm && <EditMealForm
+                submit={submitAddMealForm}
+                cancel={cancelAddMealForm}
+            />}
+            {editMeal && <EditMealForm
+                submit={submitEditMealForm}
+                cancel={() => setEditMeal('')}
+                meal={editMeal}
+            />}
+            {!showAddMealForm &&
+                <Button onClick={onAddMealButtonClick} style={{ margin: '10px' }}>
+                    Add meal
+                </Button>
+            }
             {day && <div>
                 <div style={{ display: 'flex', flexDirection: 'row' }}>
-                {/* <div style={{ display: 'flex', flexDirection: 'row', textAlign: 'left' }}> */}
                 {day.meals && day.meals.map((meal, j) => (
                     <Meal
                         key={j}
@@ -144,16 +157,6 @@ export default function Days() {
                 </div>
             </div>}
             {!day && <div>no data for this date</div>}
-            {!showAddMealForm && <Button onClick={onAddMealButtonClick}>Add meal</Button>}
-            {showAddMealForm && <EditMealForm
-                submit={submitAddMealForm}
-                cancel={cancelAddMealForm}
-            />}
-            {editMeal && <EditMealForm
-                submit={submitEditMealForm}
-                cancel={() => setEditMeal('')}
-                meal={editMeal}
-            />}
         </div>
     );
 }

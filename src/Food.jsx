@@ -10,7 +10,7 @@ export default function Food(props) {
         <span>
             {props.food.name}<br />
             {<span>
-                group: {props.food.group}<br />
+                {props.food.group && <span>group: {props.food.group}<br /></span>}
                 serving: {props.food.serving}<br />
                 calories: {props.food?.nutrition?.calories}<br />
 

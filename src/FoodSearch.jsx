@@ -4,6 +4,7 @@ import FormControl from 'react-bootstrap/FormControl';
 import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
 import Table from 'react-bootstrap/Table';
+import Spinner from 'react-bootstrap/Spinner';
 
 export const NutrientIds = {
     ENERGY: 1008,
@@ -24,11 +25,14 @@ export const NutrientIds = {
 export default function FoodSearch(props) {
     const [foodKeyword, setFoodKeyword] = useState('');
     const [searchResults, setSearchResults] = useState([]);
+    const [loading, setLoading] = useState(false);
 
     const handleSubmitSearch = async event => {
         event.preventDefault();
-
+        setLoading(true);
+        setSearchResults([]);
         await getUSDASearchResults(foodKeyword);
+        setLoading(false);
     };
 
     const getUSDASearchResults = async (keyword) => {
@@ -90,7 +94,7 @@ export default function FoodSearch(props) {
                 <Form inline onSubmit={handleSubmitSearch} style={{ margin: '10px' }}>
                     <FormControl
                         type="text"
-                        placeholder="Search"
+                        placeholder="Search for food"
                         className="mr-sm-2"
                         value={foodKeyword}
                         onChange={handleFoodKeywordChange}
@@ -98,6 +102,7 @@ export default function FoodSearch(props) {
                     <Button type="submit">Search</Button>
                 </Form>
                 <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center' }}>
+                    {loading && <Spinner animation="border" />}
                     {searchResults && searchResults.map((searchResult) => (
                         <Card key={searchResult.result.fdcId} border="primary" style={{ width: '30%', margin: '10px' }}>
                             <Card.Header>

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './App.css';
 import SignIn from './SignIn';
 import Days from './Days';
@@ -12,21 +12,23 @@ import FoodSearchPage from './FoodSearchPage';
 import { getUserFromLocalStorage } from './SignIn';
 
 function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(getUserFromLocalStorage());
+
   return (
     <div className="App">
       <Router basename={process.env.PUBLIC_URL} >
         <div>
-          <Route exact path="/" component={SignIn} />
-          <Route path="/signin" component={SignIn} />
-          {!getUserFromLocalStorage() &&
+          <Route exact path="/" render={() => <SignIn setAuthenticated={setIsAuthenticated} />} />
+          <Route path="/signin" render={() => <SignIn setAuthenticated={setIsAuthenticated} />} />
+          {!isAuthenticated &&
             <span>
               <Redirect to="/signin" />
             </span>
           }
-          {getUserFromLocalStorage() &&
+          {isAuthenticated &&
             <span>
-              <Route path="/days" component={Days} />
-              <Route path="/foodsearch" component={FoodSearchPage} />
+              <Route path="/days" render={() => <Days setAuthenticated={setIsAuthenticated} />} />
+              <Route path="/foodsearch" render={() => <FoodSearchPage setAuthenticated={setIsAuthenticated} />} />
             </span>
           }
         </div>
