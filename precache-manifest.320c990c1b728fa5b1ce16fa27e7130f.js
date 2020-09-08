@@ -1,6 +1,6 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "a3ab042f015e62a4cc8d1588409ac5b6",
+    "revision": "6671aae4c76bd2b38064989ff832ab44",
     "url": "/refactored-spoon/index.html"
   },
   {
