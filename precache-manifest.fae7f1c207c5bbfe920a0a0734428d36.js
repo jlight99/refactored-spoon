@@ -1,27 +1,27 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "38a6087758068ad89e5d3633a1c558ea",
+    "revision": "ddb022582d91fe5ab44a872a364f017c",
     "url": "/refactored-spoon/index.html"
   },
   {
-    "revision": "d0c6893cbf0046b5214a",
+    "revision": "38785dd7836967581abe",
     "url": "/refactored-spoon/static/css/2.6d52cc7f.chunk.css"
   },
   {
-    "revision": "a4da2acd8b66b7450210",
+    "revision": "8fffb187bb863f03e7c4",
     "url": "/refactored-spoon/static/css/main.523f09c5.chunk.css"
   },
   {
-    "revision": "d0c6893cbf0046b5214a",
-    "url": "/refactored-spoon/static/js/2.3750121d.chunk.js"
+    "revision": "38785dd7836967581abe",
+    "url": "/refactored-spoon/static/js/2.93785b81.chunk.js"
   },
   {
     "revision": "d2966845b94a3318bf32eecc7af8015d",
-    "url": "/refactored-spoon/static/js/2.3750121d.chunk.js.LICENSE.txt"
+    "url": "/refactored-spoon/static/js/2.93785b81.chunk.js.LICENSE.txt"
   },
   {
-    "revision": "a4da2acd8b66b7450210",
-    "url": "/refactored-spoon/static/js/main.593ee665.chunk.js"
+    "revision": "8fffb187bb863f03e7c4",
+    "url": "/refactored-spoon/static/js/main.64c6d2e0.chunk.js"
   },
   {
     "revision": "4eafd143691d924f3961",
