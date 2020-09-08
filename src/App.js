@@ -10,20 +10,19 @@ import {
 import 'bootstrap/dist/css/bootstrap.min.css';
 import FoodSearchPage from './FoodSearchPage';
 import { getUserFromLocalStorage } from './SignIn';
-import TestHome from './TestHome';
 
 function App() {
   return (
     <div className="App">
-      <Router>
+      <Router basename={process.env.PUBLIC_URL} >
         <div>
-          <Route exact path="/" component={TestHome} />
+          <Route exact path="/" component={SignIn} />
           <Route path="/signin" component={SignIn} />
-          {/* {!getUserFromLocalStorage() &&
+          {!getUserFromLocalStorage() &&
             <span>
               <Redirect to="/signin" />
             </span>
-          } */}
+          }
           {getUserFromLocalStorage() &&
             <span>
               <Route path="/days" component={Days} />
