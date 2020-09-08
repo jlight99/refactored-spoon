@@ -32,7 +32,7 @@ export default function FoodSearch(props) {
     };
 
     const getUSDASearchResults = async (keyword) => {
-        const response = await fetch('http://localhost:8081/food/search', {
+        const response = await fetch('https://shielded-earth-02834.herokuapp.com/food/search', {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -55,7 +55,7 @@ export default function FoodSearch(props) {
         console.log("totalPages");
         console.log(totalPages);
 
-        const foodsDetailRes = await fetch('http://localhost:8081/foods/detail', {
+        const foodsDetailRes = await fetch('https://shielded-earth-02834.herokuapp.com/foods/detail', {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',

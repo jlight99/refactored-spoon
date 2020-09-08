@@ -31,7 +31,7 @@ export default function Days() {
 
     const getDay = async (user, date) => {
         const dateStr = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getUTCDate();
-        const response = await fetch('http://localhost:8081/days/' + dateStr + '?user=' + user, { // TODO do NOT pass user as a path param, there should be some sort of session management
+        const response = await fetch('https://shielded-earth-02834.herokuapp.com/days/' + dateStr + '?user=' + user, { // TODO do NOT pass user as a path param, there should be some sort of session management
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
@@ -58,7 +58,7 @@ export default function Days() {
     const submitAddMealForm = async (meal) => {
         const dateStr = selectedDate.getFullYear() + '-' + (selectedDate.getMonth() + 1) + '-' + selectedDate.getUTCDate();
 
-        await fetch('http://localhost:8081/days/' + dateStr + '/meals?user=' + user, {
+        await fetch('https://shielded-earth-02834.herokuapp.com/days/' + dateStr + '/meals?user=' + user, {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -78,7 +78,7 @@ export default function Days() {
     const submitEditMealForm = async (meal) => {
         const dateStr = selectedDate.getFullYear() + '-' + (selectedDate.getMonth() + 1) + '-' + selectedDate.getUTCDate();
 
-        await fetch('http://localhost:8081/days/' + dateStr + '/meals/' + meal._id + '?user=' + user, {
+        await fetch('https://shielded-earth-02834.herokuapp.com/days/' + dateStr + '/meals/' + meal._id + '?user=' + user, {
             method: 'PUT',
             headers: {
                 'Accept': 'application/json',
@@ -94,7 +94,7 @@ export default function Days() {
     const deleteMeal = async (mealId) => {
         const dateStr = selectedDate.getFullYear() + '-' + (selectedDate.getMonth() + 1) + '-' + selectedDate.getUTCDate();
 
-        await fetch('http://localhost:8081/days/' + dateStr + '/meals/' + mealId + '?user=' + user, {
+        await fetch('https://shielded-earth-02834.herokuapp.com/days/' + dateStr + '/meals/' + mealId + '?user=' + user, {
             method: 'DELETE',
             headers: {
                 'Accept': 'application/json',
