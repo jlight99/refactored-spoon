@@ -5,6 +5,7 @@ import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
 import Table from 'react-bootstrap/Table';
 import Spinner from 'react-bootstrap/Spinner';
+import { serverURL } from './App';
 
 export const NutrientIds = {
     ENERGY: 1008,
@@ -36,7 +37,7 @@ export default function FoodSearch(props) {
     };
 
     const getUSDASearchResults = async (keyword) => {
-        const response = await fetch('https://shielded-earth-02834.herokuapp.com/food/search', {
+        const response = await fetch(serverURL + '/food/search', {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -51,6 +52,10 @@ export default function FoodSearch(props) {
         const searchResultFdcIds = [];
 
         const responseJSON = await response.json();
+        if (!responseJSON) {
+            setSearchResults([]);
+            return;
+        }
         responseJSON.forEach((result) => {
             searchResultFdcIds.push(result.fdcId);
         });
@@ -59,7 +64,7 @@ export default function FoodSearch(props) {
         console.log("totalPages");
         console.log(totalPages);
 
-        const foodsDetailRes = await fetch('https://shielded-earth-02834.herokuapp.com/foods/detail', {
+        const foodsDetailRes = await fetch(serverURL + '/foods/detail', {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -99,7 +104,8 @@ export default function FoodSearch(props) {
                         value={foodKeyword}
                         onChange={handleFoodKeywordChange}
                     />
-                    <Button type="submit">Search</Button>
+                    <Button type="submit" style={{ margin: '5px' }}>Search</Button>
+                    <Button variant="secondary" onClick={() => setSearchResults([])} style={{ margin: '5px' }}>Clear search</Button>
                 </Form>
                 <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center' }}>
                     {loading && <Spinner animation="border" />}
@@ -110,34 +116,38 @@ export default function FoodSearch(props) {
                             </Card.Header>
                             <Card.Body>
                                 FdcId: {searchResult.result.fdcId}<br />
-                                {searchResult.result.brandOwner && <span>Brand: {searchResult.result.brandOwner}</span>}<br />
-                                {searchResult.result.ingredients && <span>Ingredients: {searchResult.result.ingredients}</span>}<br />
+                                {searchResult.result.brandOwner && <span>Brand: {searchResult.result.brandOwner}<br /></span>}
+                                {searchResult.result.ingredients &&
+                                    <span>
+                                        Ingredients: {searchResult.result.ingredients}<br />
+                                    </span>
+                                }
 
                                 {searchResult.details &&
-                                        <Table style={{ marginTop: '5px' }}>
-                                            <thead>
-                                                <tr>
-                                                    <th>Nutrient</th>
-                                                    <th>Amount (per 100 grams)</th>
+                                    <Table style={{ marginTop: '5px' }}>
+                                        <thead>
+                                            <tr>
+                                                <th>Nutrient</th>
+                                                <th>Amount (per 100 grams)</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {searchResult.details.foodNutrients.filter((foodNutrient) => [NutrientIds.ENERGY, NutrientIds.PROTEIN, NutrientIds.CARBOHYDRATE, NutrientIds.FAT].includes(foodNutrient.nutrient.id)
+                                            ).map((foodNutrient) => (
+                                                <tr key={foodNutrient.id}>
+                                                    <td>{foodNutrient.nutrient.name}</td>
+                                                    <td>{foodNutrient.amount} {foodNutrient.nutrient.unitName}</td>
                                                 </tr>
-                                            </thead>
-                                            <tbody>
-                                                {searchResult.details.foodNutrients.filter((foodNutrient) => [NutrientIds.ENERGY, NutrientIds.PROTEIN, NutrientIds.CARBOHYDRATE, NutrientIds.FAT].includes(foodNutrient.nutrient.id)
-                                                ).map((foodNutrient) => (
-                                                    <tr key={foodNutrient.id}>
-                                                        <td>{foodNutrient.nutrient.name}</td>
-                                                        <td>{foodNutrient.amount} {foodNutrient.nutrient.unitName}</td>
-                                                    </tr>
-                                                ))}
-                                            </tbody>
-                                        </Table>
-                                    }
-                                    {props.showSelect && !props.fdcIds?.includes(searchResult.result.fdcId) &&
-                                        <Button onClick={() => props.selectFood(searchResult.result, searchResult.details)}>Select food</Button>
-                                    }
-                                    {props.showSelect && props.fdcIds?.includes(searchResult.result.fdcId) &&
-                                        <span style={{ 'color': 'green' }}>Food selected</span>
-                                    }
+                                            ))}
+                                        </tbody>
+                                    </Table>
+                                }
+                                {props.showSelect && !props.fdcIds?.includes(searchResult.result.fdcId) &&
+                                    <Button onClick={() => props.selectFood(searchResult.result, searchResult.details)}>Select food</Button>
+                                }
+                                {props.showSelect && props.fdcIds?.includes(searchResult.result.fdcId) &&
+                                    <span style={{ 'color': 'green' }}>Food selected</span>
+                                }
                             </Card.Body>
                         </Card>
                     ))}

@@ -10,7 +10,7 @@ export default function MyNavbar(props) {
     const handleLogout = () => {
         localStorage.removeItem('currentUser');
         props.setAuthenticated(false);
-        history.push('/signin');
+        history.push('/');
     }
 
     return (

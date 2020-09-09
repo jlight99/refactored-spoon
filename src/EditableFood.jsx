@@ -14,8 +14,6 @@ export default function EditableFood(props) {
             className="mb-2"
         >
             <Card.Header>{props.food.fdcId}</Card.Header>
-            {/* <Card.Body> */}
-                {/* <Card.Text> */}
                     {props.food.fdcId && <span style={{ margin: '5px' }}>FDC ID: {props.food.fdcId}<br /></span>}
                     {props.food.name && <span style={{ margin: '5px' }}>Name: {props.food.name}<br /></span>}
                     {props.food.details && <span style={{ margin: '5px' }}>Description: {props.food.details.description}<br /></span>}
@@ -45,9 +43,7 @@ export default function EditableFood(props) {
                         />
                         g
                     </span><br />
-                {/* </Card.Text> */}
                 <Button variant="danger" onClick={() => props.removeFood(props.food._id ? props.food._id : props.food.fdcId)}>Remove</Button>
-            {/* </Card.Body> */}
         </Card>
     );
 }

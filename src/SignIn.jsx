@@ -3,6 +3,7 @@ import SignInForm from './SignInForm';
 import Tabs from 'react-bootstrap/Tabs';
 import Tab from 'react-bootstrap/Tab';
 import { useHistory } from "react-router-dom";
+import { serverURL } from './App';
 
 export function getUserFromLocalStorage() {
     return localStorage.getItem('currentUser');
@@ -14,7 +15,7 @@ export default function SignIn(props) {
     const [error, setError] = useState('');
 
     const handleSubmit = async (email, password, type) => {
-        const response = await fetch('https://shielded-earth-02834.herokuapp.com/' + type, {
+        const response = await fetch(serverURL + '/' + type, {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -47,7 +48,7 @@ export default function SignIn(props) {
     };
 
     return (
-        <div>
+        <div style={{ width: '50%', height: 'auto' }}>
             <Tabs
                 id="signin-tabs"
                 activeKey={key}

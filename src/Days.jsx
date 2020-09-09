@@ -8,6 +8,7 @@ import EditMealForm from './EditMealForm';
 import Meal from './Meal';
 import NutritionTable, { checkNutritionExists } from './NutritionTable';
 import { getUserFromLocalStorage } from './SignIn';
+import { serverURL } from './App';
 
 export default function Days(props) {
     const [day, setDay] = useState();
@@ -16,8 +17,6 @@ export default function Days(props) {
     const [editMeal, setEditMeal] = useState('');
 
     useEffect(() => {
-        console.log("Days useEffect");
-        console.log(getUserFromLocalStorage());
         fetchDay(selectedDate);
         // disabled lint on next line because otherwise lint would complain about fetchDays being a missing dependency
         // when in reality, fetchDays is a method defined separately underneath, since it is used in other places
@@ -31,7 +30,7 @@ export default function Days(props) {
 
     const getDay = async (date) => {
         const dateStr = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getUTCDate();
-        const response = await fetch('https://shielded-earth-02834.herokuapp.com/days/' + dateStr + '?user=' + getUserFromLocalStorage(), {
+        const response = await fetch(serverURL + '/days/' + dateStr + '?user=' + getUserFromLocalStorage(), {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
@@ -39,7 +38,7 @@ export default function Days(props) {
             },
         });
         const responseJSON = await response.json();
-        if (responseJSON._id === "000000000000000000000000") {
+        if (responseJSON._id === "000000000000000000000000") { // response for nonexistent record
             return null;
         }
         return responseJSON;
@@ -58,7 +57,7 @@ export default function Days(props) {
     const submitAddMealForm = async (meal) => {
         const dateStr = selectedDate.getFullYear() + '-' + (selectedDate.getMonth() + 1) + '-' + selectedDate.getUTCDate();
 
-        await fetch('https://shielded-earth-02834.herokuapp.com/days/' + dateStr + '/meals?user=' + getUserFromLocalStorage(), {
+        await fetch(serverURL + '/days/' + dateStr + '/meals?user=' + getUserFromLocalStorage(), {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -78,7 +77,7 @@ export default function Days(props) {
     const submitEditMealForm = async (meal) => {
         const dateStr = selectedDate.getFullYear() + '-' + (selectedDate.getMonth() + 1) + '-' + selectedDate.getUTCDate();
 
-        await fetch('https://shielded-earth-02834.herokuapp.com/days/' + dateStr + '/meals/' + meal._id + '?user=' + getUserFromLocalStorage(), {
+        await fetch(serverURL + '/days/' + dateStr + '/meals/' + meal._id + '?user=' + getUserFromLocalStorage(), {
             method: 'PUT',
             headers: {
                 'Accept': 'application/json',
@@ -94,7 +93,7 @@ export default function Days(props) {
     const deleteMeal = async (mealId) => {
         const dateStr = selectedDate.getFullYear() + '-' + (selectedDate.getMonth() + 1) + '-' + selectedDate.getUTCDate();
 
-        await fetch('https://shielded-earth-02834.herokuapp.com/days/' + dateStr + '/meals/' + mealId + '?user=' + getUserFromLocalStorage(), {
+        await fetch(serverURL + '/days/' + dateStr + '/meals/' + mealId + '?user=' + getUserFromLocalStorage(), {
             method: 'DELETE',
             headers: {
                 'Accept': 'application/json',
@@ -131,12 +130,12 @@ export default function Days(props) {
                 cancel={() => setEditMeal('')}
                 meal={editMeal}
             />}
-            {!showAddMealForm &&
+            {!showAddMealForm && !editMeal &&
                 <Button onClick={onAddMealButtonClick} style={{ margin: '10px' }}>
                     Add meal
                 </Button>
             }
-            {day && <div>
+            {!showAddMealForm && !editMeal && day && <div>
                 <div style={{ display: 'flex', flexDirection: 'row' }}>
                 {day.meals && day.meals.map((meal, j) => (
                     <Meal
@@ -150,7 +149,7 @@ export default function Days(props) {
                 <div>
                     {checkNutritionExists(day.nutrition) &&
                         <span>
-                            Nutrition summary of the day
+                            Daily nutrition summary
                             <NutritionTable nutrition={day.nutrition} />
                         </span>
                     }

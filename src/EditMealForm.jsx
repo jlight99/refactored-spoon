@@ -68,7 +68,6 @@ export default function EditMealForm(props) {
         props.submit(meal);
     };
 
-    // need to store base cal / 100 in food somewhere
     const updateServingSize = (food, newServingSize) => {
         const newFoods = foods.map((oldFood) => {
             const isMatch = food._id ? oldFood._id === food._id : oldFood.fdcId === food.fdcId;
@@ -209,22 +208,25 @@ export default function EditMealForm(props) {
         <div style={{ 'margin': '50px' }}>
             <div>
                 <div style={{ borderStyle: 'solid', borderWidth: '1px', padding: '20px' }}>
-                    <div>Meal:</div>
-                    Meal nutrition summary
-                    {checkNutritionExists(mealNutrition) && <NutritionTable nutrition={mealNutrition} />}
-
                     <Dropdown onSelect={setMealName} value={mealName}>
                         <Dropdown.Toggle style={{ backgroundColor: 'white', color: 'black' }}>
                             {mealName ? mealName : "Meal"}
                         </Dropdown.Toggle>
                         <Dropdown.Menu>
                             {mealOptions.map((option) => (
-                                <Dropdown.Item key={option.value} eventKey={option.value}>{option.label}</Dropdown.Item>
+                                <Dropdown.Item key={option.label} eventKey={option.label}>{option.label}</Dropdown.Item>
                             ))}
                         </Dropdown.Menu>
                     </Dropdown>
 
-                    <div>Foods:</div>
+                    {checkNutritionExists(mealNutrition) &&
+                        <div>
+                            Nutrition summary
+                            <NutritionTable nutrition={mealNutrition} />
+                        </div>
+                    }
+
+                    <div style={{ marginTop: '20px' }}>Foods</div>
                     <span style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center' }}>
                         {foods.map((food) => (
                             <EditableFood

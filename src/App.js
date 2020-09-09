@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import './App.css';
-import SignIn from './SignIn';
 import Days from './Days';
 import {
   BrowserRouter as Router,
@@ -10,6 +9,7 @@ import {
 import 'bootstrap/dist/css/bootstrap.min.css';
 import FoodSearchPage from './FoodSearchPage';
 import { getUserFromLocalStorage } from './SignIn';
+import HomePage from './HomePage';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(getUserFromLocalStorage());
@@ -17,21 +17,18 @@ function App() {
   return (
     <div className="App">
       <Router basename={process.env.PUBLIC_URL} >
-        <div>
-          <Route exact path="/" render={() => <SignIn setAuthenticated={setIsAuthenticated} />} />
-          <Route path="/signin" render={() => <SignIn setAuthenticated={setIsAuthenticated} />} />
-          {!isAuthenticated &&
-            <span>
-              <Redirect to="/signin" />
-            </span>
-          }
-          {isAuthenticated &&
-            <span>
-              <Route path="/days" render={() => <Days setAuthenticated={setIsAuthenticated} />} />
-              <Route path="/foodsearch" render={() => <FoodSearchPage setAuthenticated={setIsAuthenticated} />} />
-            </span>
-          }
-        </div>
+        <Route exact path="/" render={() => <HomePage setAuthenticated={setIsAuthenticated} />} />
+        {!isAuthenticated &&
+          <span>
+            <Redirect to="/" />
+          </span>
+        }
+        {isAuthenticated &&
+          <span>
+            <Route path="/days" render={() => <Days setAuthenticated={setIsAuthenticated} />} />
+            <Route path="/foodsearch" render={() => <FoodSearchPage setAuthenticated={setIsAuthenticated} />} />
+          </span>
+        }
       </Router>
     </div>
   );
