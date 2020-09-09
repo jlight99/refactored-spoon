@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
 
 importScripts(
-  "/refactored-spoon/precache-manifest.70297f06ab2c99a5ae002ac10a970d37.js"
+  "/refactored-spoon/precache-manifest.e4e1973cdf1b1eb2db59ab477500da9e.js"
 );
 
 self.addEventListener('message', (event) => {
