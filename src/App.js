@@ -11,6 +11,8 @@ import FoodSearchPage from './FoodSearchPage';
 import { getUserFromLocalStorage } from './SignIn';
 import HomePage from './HomePage';
 
+export const serverURL = "https://shielded-earth-02834.herokuapp.com";
+
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(getUserFromLocalStorage());
 
