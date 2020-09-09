@@ -95,18 +95,20 @@ export default function FoodSearch(props) {
 
     return (
         <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
-            <span style={{ flexDirection: 'column' }}>
-                <Form inline onSubmit={handleSubmitSearch} style={{ margin: '10px' }}>
-                    <FormControl
-                        type="text"
-                        placeholder="Search for food"
-                        className="mr-sm-2"
-                        value={foodKeyword}
-                        onChange={handleFoodKeywordChange}
-                    />
-                    <Button type="submit" style={{ margin: '5px' }}>Search</Button>
-                    <Button variant="secondary" onClick={() => setSearchResults([])} style={{ margin: '5px' }}>Clear search</Button>
-                </Form>
+            <span>
+                <span style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', margin: '10px' }}>
+                    <Form inline onSubmit={handleSubmitSearch}>
+                        <FormControl
+                            type="text"
+                            placeholder="Search for food"
+                            className="mr-sm-2"
+                            value={foodKeyword}
+                            onChange={handleFoodKeywordChange}
+                        />
+                        <Button type="submit" style={{ margin: '5px' }}>Search</Button>
+                        <Button variant="secondary" onClick={() => setSearchResults([])} style={{ margin: '5px' }}>Clear search</Button>
+                    </Form>
+                </span>
                 <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center' }}>
                     {loading && <Spinner animation="border" />}
                     {searchResults && searchResults.map((searchResult) => (
@@ -123,7 +125,7 @@ export default function FoodSearch(props) {
                                     </span>
                                 }
 
-                                {searchResult.details &&
+                                {searchResult?.details?.foodNutrients &&
                                     <Table style={{ marginTop: '5px' }}>
                                         <thead>
                                             <tr>
