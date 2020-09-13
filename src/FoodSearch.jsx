@@ -2,26 +2,9 @@ import React, { useState } from 'react';
 import Form from 'react-bootstrap/Form';
 import FormControl from 'react-bootstrap/FormControl';
 import Button from 'react-bootstrap/Button';
-import Card from 'react-bootstrap/Card';
-import Table from 'react-bootstrap/Table';
 import Spinner from 'react-bootstrap/Spinner';
 import { serverURL } from './App';
-
-export const NutrientIds = {
-    ENERGY: 1008,
-    CALCIUM: 1087,
-    IRON: 1089,
-    VITAMIN_A: 1104,
-    VITAMIN_C: 1162,
-    PROTEIN: 1003,
-    FAT: 1004,
-    CARBOHYDRATE: 1005,
-    SUGAR: 2000,
-    FIBER: 1079,
-    POTASSIUM: 1092,
-    SODIUM: 1093,
-    CHOLESTEROL: 1253,
-};
+import FoodSearchResult from './FoodSearchResult';
 
 export default function FoodSearch(props) {
     const [foodKeyword, setFoodKeyword] = useState('');
@@ -35,7 +18,7 @@ export default function FoodSearch(props) {
         event.preventDefault();
         setLoading(true);
         setSearchResults([]);
-        await getUSDASearchResults(foodKeyword);
+        await searchFood(foodKeyword);
         setLoading(false);
     };
 
@@ -48,11 +31,41 @@ export default function FoodSearch(props) {
         setPageChangeError("");
         setLoading(true);
         setSearchResults([]);
-        await getUSDASearchResults(foodKeyword, 9, pageNumber);
+        await searchFood(foodKeyword, 9, pageNumber);
         setLoading(false);
     };
 
-    const getUSDASearchResults = async (keyword, pageSize = 9, pageNumber = 1) => {
+    const searchFood = async (keyword, pageSize = 9, pageNumber = 1) => {
+        const searchResponse = await searchUSDAFood(keyword, pageSize, pageNumber);
+        const searchedFoods = searchResponse?.foods ? searchResponse.foods : [];
+
+        if (searchedFoods.length === 0) {
+            setSearchResults([]);
+            return;
+        }
+
+        const searchResultFdcIds = [];
+        searchedFoods.forEach((result) => {
+            searchResultFdcIds.push(result.fdcId);
+        });
+
+        setTotalPages(searchResponse.totalPages);
+        setPageNumber(searchResponse.currentPage);
+
+        const foodsDetails = await getUSDAFoodDetailsBulk(searchResultFdcIds);
+        const usdaSearchResults = [];
+        for (var i = 0; i < searchedFoods.length; i++) {
+            const newUSDASearchResult = {
+                result: searchedFoods[i],
+                details: foodsDetails[i],
+            };
+            usdaSearchResults.push(newUSDASearchResult);
+        }
+
+        setSearchResults(usdaSearchResults);
+    };
+
+    const searchUSDAFood = async (keyword, pageSize, pageNumber) => {
         const response = await fetch(serverURL + '/food/search', {
             method: 'POST',
             headers: {
@@ -67,22 +80,10 @@ export default function FoodSearch(props) {
             }),
         });
 
-        const searchResultFdcIds = [];
+        return await response.json();
+    };
 
-        const searchResponse = await response.json();
-        const searchedFoods = searchResponse?.foods ? searchResponse.foods : [];
-        if (!searchedFoods) {
-            setSearchResults([]);
-            return;
-        }
-        searchedFoods.forEach((result) => {
-            searchResultFdcIds.push(result.fdcId);
-        });
-
-        const totalPages = searchResponse.totalPages;
-        setTotalPages(totalPages);
-        setPageNumber(searchResponse.currentPage);
-
+    const getUSDAFoodDetailsBulk = async (fdcIds) => {
         const foodsDetailRes = await fetch(serverURL + '/foods/detail', {
             method: 'POST',
             headers: {
@@ -90,21 +91,11 @@ export default function FoodSearch(props) {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                foods: searchResultFdcIds,
+                foods: fdcIds,
             }),
         });
 
-        const foodsDetailResJSON = await foodsDetailRes.json();
-        const usdaSearchResults = [];
-        searchedFoods.forEach((result) => {
-            const newUSDASearchResult = {
-                result: result,
-                details: foodsDetailResJSON.filter((detail) => detail.fdcId === result.fdcId)[0],
-            };
-            usdaSearchResults.push(newUSDASearchResult);
-        });
-
-        setSearchResults(usdaSearchResults);
+        return await foodsDetailRes.json();
     };
 
     const handleFoodKeywordChange = event => {
@@ -134,49 +125,18 @@ export default function FoodSearch(props) {
                 <div>
                     {loading && <Spinner animation="border" />}
                     {searchResults && searchResults.length > 0 &&
-                        <span style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center' }}>
-                            {searchResults.map((searchResult) => (
-                                <Card key={searchResult.result.fdcId} border="primary" style={{ width: '30%', margin: '10px' }}>
-                                    <Card.Header>
-                                        {searchResult.result.description}
-                                    </Card.Header>
-                                    <Card.Body>
-                                        FdcId: {searchResult.result.fdcId}<br />
-                                        {searchResult.result.brandOwner && <span>Brand: {searchResult.result.brandOwner}<br /></span>}
-                                        {searchResult.result.ingredients &&
-                                            <span>
-                                                Ingredients: {searchResult.result.ingredients}<br />
-                                            </span>
-                                        }
-                                        {searchResult?.details?.foodNutrients &&
-                                            <Table style={{ marginTop: '5px' }}>
-                                                <thead>
-                                                    <tr>
-                                                        <th>Nutrient</th>
-                                                        <th>Amount (per 100 grams)</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    {searchResult.details.foodNutrients.filter((foodNutrient) => [NutrientIds.ENERGY, NutrientIds.PROTEIN, NutrientIds.CARBOHYDRATE, NutrientIds.FAT].includes(foodNutrient.nutrient.id)
-                                                    ).map((foodNutrient) => (
-                                                        <tr key={foodNutrient.id}>
-                                                            <td>{foodNutrient.nutrient.name}</td>
-                                                            <td>{foodNutrient.amount} {foodNutrient.nutrient.unitName}</td>
-                                                        </tr>
-                                                    ))}
-                                                </tbody>
-                                            </Table>
-                                        }
-                                        {props.showSelect && !props.fdcIds?.includes(searchResult.result.fdcId) &&
-                                            <Button onClick={() => props.selectFood(searchResult.result, searchResult.details)}>Select food</Button>
-                                        }
-                                        {props.showSelect && props.fdcIds?.includes(searchResult.result.fdcId) &&
-                                            <span style={{ 'color': 'green' }}>Food selected</span>
-                                        }
-                                    </Card.Body>
-                                </Card>
-                            ))}
-                            <div>
+                        <span style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                            <span style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center' }}>
+                                {searchResults.map((searchResult) => (
+                                    <FoodSearchResult
+                                        showSelect={props.showSelect}
+                                        selectFood={props.selectFood}
+                                        fdcIds={props.fdcIds}
+                                        searchResult={searchResult}
+                                    />
+                                ))}
+                            </span>
+                            <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center' }}>
                                 <Form inline onSubmit={handleSubmitPageChange}>
                                     Page
                                     <FormControl

@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import Dropdown from 'react-bootstrap/Dropdown';
 
-import FoodSearch, { NutrientIds } from './FoodSearch';
+import FoodSearch from './FoodSearch';
+import { NutrientIds } from './FoodSearchResult';
 import EditableFood from './EditableFood';
 import NutritionTable, { checkNutritionExists } from './NutritionTable';
 
