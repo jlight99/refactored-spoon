@@ -27,6 +27,9 @@ export default function FoodSearch(props) {
     const [foodKeyword, setFoodKeyword] = useState('');
     const [searchResults, setSearchResults] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [totalPages, setTotalPages] = useState(0);
+    const [pageNumber, setPageNumber] = useState(1);
+    const [pageChangeError, setPageChangeError] = useState("");
 
     const handleSubmitSearch = async event => {
         event.preventDefault();
@@ -36,7 +39,20 @@ export default function FoodSearch(props) {
         setLoading(false);
     };
 
-    const getUSDASearchResults = async (keyword) => {
+    const handleSubmitPageChange = async event => {
+        event.preventDefault();
+        if (pageNumber > totalPages) {
+            setPageChangeError("error! page " + pageNumber + " does not exist.");
+            return;
+        }
+        setPageChangeError("");
+        setLoading(true);
+        setSearchResults([]);
+        await getUSDASearchResults(foodKeyword, 9, pageNumber);
+        setLoading(false);
+    };
+
+    const getUSDASearchResults = async (keyword, pageSize = 9, pageNumber = 1) => {
         const response = await fetch(serverURL + '/food/search', {
             method: 'POST',
             headers: {
@@ -44,25 +60,28 @@ export default function FoodSearch(props) {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                food: keyword,
-                pageSize: "9",
+                generalSearchInput: keyword,
+                pageSize: pageSize,
+                pageNumber: pageNumber >= 0 ? pageNumber : 1,
+                requireAllWords: true,
             }),
         });
 
         const searchResultFdcIds = [];
 
-        const responseJSON = await response.json();
-        if (!responseJSON) {
+        const searchResponse = await response.json();
+        const searchedFoods = searchResponse?.foods ? searchResponse.foods : [];
+        if (!searchedFoods) {
             setSearchResults([]);
             return;
         }
-        responseJSON.forEach((result) => {
+        searchedFoods.forEach((result) => {
             searchResultFdcIds.push(result.fdcId);
         });
 
-        const totalPages = responseJSON.TotalPages;
-        console.log("totalPages");
-        console.log(totalPages);
+        const totalPages = searchResponse.totalPages;
+        setTotalPages(totalPages);
+        setPageNumber(searchResponse.currentPage);
 
         const foodsDetailRes = await fetch(serverURL + '/foods/detail', {
             method: 'POST',
@@ -76,9 +95,8 @@ export default function FoodSearch(props) {
         });
 
         const foodsDetailResJSON = await foodsDetailRes.json();
-
         const usdaSearchResults = [];
-        responseJSON.forEach((result) => {
+        searchedFoods.forEach((result) => {
             const newUSDASearchResult = {
                 result: result,
                 details: foodsDetailResJSON.filter((detail) => detail.fdcId === result.fdcId)[0],
@@ -91,6 +109,10 @@ export default function FoodSearch(props) {
 
     const handleFoodKeywordChange = event => {
         setFoodKeyword(event.target.value);
+    };
+
+    const handlePageNumberChange = event => {
+        setPageNumber(parseInt(event.target.value));
     };
 
     return (
@@ -109,50 +131,67 @@ export default function FoodSearch(props) {
                         <Button variant="secondary" onClick={() => setSearchResults([])} style={{ margin: '5px' }}>Clear search</Button>
                     </Form>
                 </span>
-                <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center' }}>
+                <div>
                     {loading && <Spinner animation="border" />}
-                    {searchResults && searchResults.map((searchResult) => (
-                        <Card key={searchResult.result.fdcId} border="primary" style={{ width: '30%', margin: '10px' }}>
-                            <Card.Header>
-                                {searchResult.result.description}
-                            </Card.Header>
-                            <Card.Body>
-                                FdcId: {searchResult.result.fdcId}<br />
-                                {searchResult.result.brandOwner && <span>Brand: {searchResult.result.brandOwner}<br /></span>}
-                                {searchResult.result.ingredients &&
-                                    <span>
-                                        Ingredients: {searchResult.result.ingredients}<br />
-                                    </span>
-                                }
-
-                                {searchResult?.details?.foodNutrients &&
-                                    <Table style={{ marginTop: '5px' }}>
-                                        <thead>
-                                            <tr>
-                                                <th>Nutrient</th>
-                                                <th>Amount (per 100 grams)</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {searchResult.details.foodNutrients.filter((foodNutrient) => [NutrientIds.ENERGY, NutrientIds.PROTEIN, NutrientIds.CARBOHYDRATE, NutrientIds.FAT].includes(foodNutrient.nutrient.id)
-                                            ).map((foodNutrient) => (
-                                                <tr key={foodNutrient.id}>
-                                                    <td>{foodNutrient.nutrient.name}</td>
-                                                    <td>{foodNutrient.amount} {foodNutrient.nutrient.unitName}</td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </Table>
-                                }
-                                {props.showSelect && !props.fdcIds?.includes(searchResult.result.fdcId) &&
-                                    <Button onClick={() => props.selectFood(searchResult.result, searchResult.details)}>Select food</Button>
-                                }
-                                {props.showSelect && props.fdcIds?.includes(searchResult.result.fdcId) &&
-                                    <span style={{ 'color': 'green' }}>Food selected</span>
-                                }
-                            </Card.Body>
-                        </Card>
-                    ))}
+                    {searchResults && searchResults.length > 0 &&
+                        <span style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center' }}>
+                            {searchResults.map((searchResult) => (
+                                <Card key={searchResult.result.fdcId} border="primary" style={{ width: '30%', margin: '10px' }}>
+                                    <Card.Header>
+                                        {searchResult.result.description}
+                                    </Card.Header>
+                                    <Card.Body>
+                                        FdcId: {searchResult.result.fdcId}<br />
+                                        {searchResult.result.brandOwner && <span>Brand: {searchResult.result.brandOwner}<br /></span>}
+                                        {searchResult.result.ingredients &&
+                                            <span>
+                                                Ingredients: {searchResult.result.ingredients}<br />
+                                            </span>
+                                        }
+                                        {searchResult?.details?.foodNutrients &&
+                                            <Table style={{ marginTop: '5px' }}>
+                                                <thead>
+                                                    <tr>
+                                                        <th>Nutrient</th>
+                                                        <th>Amount (per 100 grams)</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {searchResult.details.foodNutrients.filter((foodNutrient) => [NutrientIds.ENERGY, NutrientIds.PROTEIN, NutrientIds.CARBOHYDRATE, NutrientIds.FAT].includes(foodNutrient.nutrient.id)
+                                                    ).map((foodNutrient) => (
+                                                        <tr key={foodNutrient.id}>
+                                                            <td>{foodNutrient.nutrient.name}</td>
+                                                            <td>{foodNutrient.amount} {foodNutrient.nutrient.unitName}</td>
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                            </Table>
+                                        }
+                                        {props.showSelect && !props.fdcIds?.includes(searchResult.result.fdcId) &&
+                                            <Button onClick={() => props.selectFood(searchResult.result, searchResult.details)}>Select food</Button>
+                                        }
+                                        {props.showSelect && props.fdcIds?.includes(searchResult.result.fdcId) &&
+                                            <span style={{ 'color': 'green' }}>Food selected</span>
+                                        }
+                                    </Card.Body>
+                                </Card>
+                            ))}
+                            <div>
+                                <Form inline onSubmit={handleSubmitPageChange}>
+                                    Page
+                                    <FormControl
+                                        type="number"
+                                        style={{ margin: '5px', width: '80px' }}
+                                        value={pageNumber}
+                                        onChange={handlePageNumberChange}
+                                    />
+                                    of {totalPages}
+                                    <Button type="submit" style={{ margin: '5px' }}>Go</Button>
+                                </Form>
+                                <div style={{ color: 'red' }}>{pageChangeError}</div>
+                            </div>
+                        </span>
+                    }
                 </div>
             </span>
         </div>
