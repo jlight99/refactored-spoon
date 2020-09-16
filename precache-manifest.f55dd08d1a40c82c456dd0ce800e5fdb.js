@@ -1,6 +1,6 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "16df00776c3889d866c1f7742f7de7ff",
+    "revision": "eeb001b50d23282e5e330b975d257a61",
     "url": "/refactored-spoon/index.html"
   },
   {
@@ -8,7 +8,7 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/refactored-spoon/static/css/2.6d52cc7f.chunk.css"
   },
   {
-    "revision": "2265c3e01ea672274e00",
+    "revision": "ee5b92615d674fd8b1fc",
     "url": "/refactored-spoon/static/css/main.523f09c5.chunk.css"
   },
   {
@@ -20,8 +20,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/refactored-spoon/static/js/2.5136ca1c.chunk.js.LICENSE.txt"
   },
   {
-    "revision": "2265c3e01ea672274e00",
-    "url": "/refactored-spoon/static/js/main.dd82153c.chunk.js"
+    "revision": "ee5b92615d674fd8b1fc",
+    "url": "/refactored-spoon/static/js/main.b34c3e71.chunk.js"
   },
   {
     "revision": "4eafd143691d924f3961",
