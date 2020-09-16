@@ -16,7 +16,7 @@ export default function Meal(props) {
         >
             <Card.Header>
                 <span>{props.meal.name}</span><br />
-                <Button variant="link" size="sm" onClick={() => props.updateMeal(props.meal)}>
+                <Button variant="link" size="sm" onClick={() => props.updateMeal()}>
                     <FontAwesomeIcon icon={faEdit} style={{ color: 'black' }} />
                 </Button>
                 <Button variant="link" size="sm" onClick={() => props.deleteMeal(props.meal._id)}>
@@ -24,18 +24,20 @@ export default function Meal(props) {
                 </Button>
             </Card.Header>
             <Card.Body>
-                <Card.Text>
-                    {props.meal?.foods?.map((food, k) => (
+                {props.meal?.foods?.map((food, k) => {
+                    return (
                         <span key={k}>
                             <Food food={food} />
                         </span>
-                    ))}
-                </Card.Text>
+                    );
+                })}
             </Card.Body>
-            <div>
-                Meal nutrition
-                {checkNutritionExists(props.meal?.nutrition) && <NutritionTable nutrition={props.meal.nutrition} />}
-            </div>
+            {!!props.meal?.foods && checkNutritionExists(props.meal?.nutrition) &&
+                <div>
+                    Meal nutrition
+                    <NutritionTable nutrition={props.meal.nutrition} />
+                </div>
+            }
         </Card>
     );
 }

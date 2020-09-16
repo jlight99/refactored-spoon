@@ -44,25 +44,10 @@ export default function FoodSearch(props) {
             return;
         }
 
-        const searchResultFdcIds = [];
-        searchedFoods.forEach((result) => {
-            searchResultFdcIds.push(result.fdcId);
-        });
-
         setTotalPages(searchResponse.totalPages);
         setPageNumber(searchResponse.currentPage);
 
-        const foodsDetails = await getUSDAFoodDetailsBulk(searchResultFdcIds);
-        const usdaSearchResults = [];
-        for (var i = 0; i < searchedFoods.length; i++) {
-            const newUSDASearchResult = {
-                result: searchedFoods[i],
-                details: foodsDetails[i],
-            };
-            usdaSearchResults.push(newUSDASearchResult);
-        }
-
-        setSearchResults(usdaSearchResults);
+        setSearchResults(searchedFoods);
     };
 
     const searchUSDAFood = async (keyword, pageSize, pageNumber) => {
@@ -81,21 +66,6 @@ export default function FoodSearch(props) {
         });
 
         return await response.json();
-    };
-
-    const getUSDAFoodDetailsBulk = async (fdcIds) => {
-        const foodsDetailRes = await fetch(serverURL + '/foods/detail', {
-            method: 'POST',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                foods: fdcIds,
-            }),
-        });
-
-        return await foodsDetailRes.json();
     };
 
     const handleFoodKeywordChange = event => {
@@ -129,8 +99,9 @@ export default function FoodSearch(props) {
                             <span style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center' }}>
                                 {searchResults.map((searchResult) => (
                                     <FoodSearchResult
+                                        key={searchResult.fdcId}
                                         showSelect={props.showSelect}
-                                        selectFood={props.selectFood}
+                                        selectFood={() => props.selectFood(searchResult)}
                                         fdcIds={props.fdcIds}
                                         searchResult={searchResult}
                                     />

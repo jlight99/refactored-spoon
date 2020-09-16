@@ -10,13 +10,12 @@ export default function Food(props) {
         <span>
             {props.food.name}<br />
             {<span>
-                {props.food.group && <span>group: {props.food.group}<br /></span>}
                 serving: {props.food.serving}<br />
-                calories: {props.food?.nutrition?.calories}<br />
+                calories: {props.food.nutrition?.calories?.value} kcal<br />
 
                 {!displayNutritionInfo &&
                     <span>
-                        <Button variant="secondary" onClick={() => setDisplayNutritionInfo(true)}>See nutrition</Button>
+                        <Button variant="secondary" onClick={() => setDisplayNutritionInfo(true)} style={{ marginTop: '10px', marginBottom: '20px' }}>See nutrition</Button>
                         <br />
                     </span>
                 }
@@ -24,8 +23,7 @@ export default function Food(props) {
                     <span>
                         Food nutrition
                         <NutritionTable nutrition={props.food.nutrition} height='180px' />
-                        <Button variant="secondary" onClick={() => setDisplayNutritionInfo(false)}>Hide nutrition</Button>
-                        <br />
+                        <Button variant="secondary" onClick={() => setDisplayNutritionInfo(false)} style={{ marginTop: '10px', marginBottom: '20px' }}>Hide nutrition</Button>
                     </span>
                 }
             </span>}

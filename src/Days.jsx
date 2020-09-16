@@ -30,7 +30,7 @@ export default function Days(props) {
 
     const getDay = async (date) => {
         const dateStr = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getUTCDate();
-        const response = await fetch(serverURL + '/days/' + dateStr + '?user=' + getUserFromLocalStorage(), {
+        const response = await fetch(serverURL + '/days/' + dateStr + '?userId=' + getUserFromLocalStorage(), {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
@@ -57,7 +57,7 @@ export default function Days(props) {
     const submitAddMealForm = async (meal) => {
         const dateStr = selectedDate.getFullYear() + '-' + (selectedDate.getMonth() + 1) + '-' + selectedDate.getUTCDate();
 
-        await fetch(serverURL + '/days/' + dateStr + '/meals?user=' + getUserFromLocalStorage(), {
+        await fetch(serverURL + '/days/' + dateStr + '/meals?userId=' + getUserFromLocalStorage(), {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -77,7 +77,7 @@ export default function Days(props) {
     const submitEditMealForm = async (meal) => {
         const dateStr = selectedDate.getFullYear() + '-' + (selectedDate.getMonth() + 1) + '-' + selectedDate.getUTCDate();
 
-        await fetch(serverURL + '/days/' + dateStr + '/meals/' + meal._id + '?user=' + getUserFromLocalStorage(), {
+        await fetch(serverURL + '/days/' + dateStr + '/meals/' + meal._id + '?userId=' + getUserFromLocalStorage(), {
             method: 'PUT',
             headers: {
                 'Accept': 'application/json',
@@ -93,7 +93,7 @@ export default function Days(props) {
     const deleteMeal = async (mealId) => {
         const dateStr = selectedDate.getFullYear() + '-' + (selectedDate.getMonth() + 1) + '-' + selectedDate.getUTCDate();
 
-        await fetch(serverURL + '/days/' + dateStr + '/meals/' + mealId + '?user=' + getUserFromLocalStorage(), {
+        await fetch(serverURL + '/days/' + dateStr + '/meals/' + mealId + '?userId=' + getUserFromLocalStorage(), {
             method: 'DELETE',
             headers: {
                 'Accept': 'application/json',
@@ -141,13 +141,13 @@ export default function Days(props) {
                     <Meal
                         key={j}
                         meal={meal}
-                        updateMeal={updateMeal}
+                        updateMeal={() => updateMeal(meal)}
                         deleteMeal={deleteMeal}
                     />
                 ))}
                 </div>
                 <div>
-                    {checkNutritionExists(day.nutrition) &&
+                    {day?.meals && checkNutritionExists(day.nutrition) &&
                         <span>
                             Daily nutrition summary
                             <NutritionTable nutrition={day.nutrition} />
@@ -155,7 +155,7 @@ export default function Days(props) {
                     }
                 </div>
             </div>}
-            {!day && <div>no data for this date</div>}
+            {!day?.meals && <div>no data for this date</div>}
         </div>
     );
 }

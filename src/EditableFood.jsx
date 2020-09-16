@@ -16,8 +16,8 @@ export default function EditableFood(props) {
             <Card.Header>{props.food.fdcId}</Card.Header>
                     {props.food.fdcId && <span style={{ margin: '5px' }}>FDC ID: {props.food.fdcId}<br /></span>}
                     {props.food.name && <span style={{ margin: '5px' }}>Name: {props.food.name}<br /></span>}
-                    {props.food.details && <span style={{ margin: '5px' }}>Description: {props.food.details.description}<br /></span>}
-                    <span style={{ margin: '5px' }}>Calories: {props.food.nutrition.calories}<br /></span>
+                    {props.food.description && <span style={{ margin: '5px' }}>Description: {props.food.description}<br /></span>}
+                    <span style={{ margin: '5px' }}>Calories: {props.food.nutrition.calories.value} kcal<br /></span>
 
                     {!displayNutritionInfo && 
                         <span>
@@ -39,7 +39,7 @@ export default function EditableFood(props) {
                             placeholder={100}
                             style={{ width: '80px', display: 'inline-block', margin: '5px' }}
                             value={props.food.serving}
-                            onChange={(e) => props.updateServingSize(props.food, e.target.value)}
+                            onChange={(e) => props.updateServingSize(e.target.value)}
                         />
                         g
                     </span><br />

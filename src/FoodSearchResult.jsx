@@ -21,19 +21,19 @@ export const NutrientIds = {
 
 export default function FoodSearchResult(props) {
     return (
-        <Card key={props.searchResult.result.fdcId} border="primary" style={{ width: '30%', margin: '10px' }}>
+        <Card key={props.searchResult.fdcId} border="primary" style={{ width: '30%', margin: '10px' }}>
             <Card.Header>
-                {props.searchResult.result.description}
+                {props.searchResult.description}
             </Card.Header>
             <Card.Body>
-                FdcId: {props.searchResult.result.fdcId}<br />
-                {props.searchResult.result.brandOwner && <span>Brand: {props.searchResult.result.brandOwner}<br /></span>}
-                {props.searchResult.result.ingredients &&
+                FdcId: {props.searchResult.fdcId}<br />
+                {props.searchResult.brandOwner && <span>Brand: {props.searchResult.brandOwner}<br /></span>}
+                {props.searchResult.ingredients &&
                     <span>
-                        Ingredients: {props.searchResult.result.ingredients}<br />
+                        Ingredients: {props.searchResult.ingredients}<br />
                     </span>
                 }
-                {props.searchResult?.details?.foodNutrients &&
+                {props.searchResult.foodNutrients &&
                     <Table style={{ marginTop: '5px' }}>
                         <thead>
                             <tr>
@@ -42,20 +42,20 @@ export default function FoodSearchResult(props) {
                             </tr>
                         </thead>
                         <tbody>
-                            {props.searchResult.details.foodNutrients.filter((foodNutrient) => [NutrientIds.ENERGY, NutrientIds.PROTEIN, NutrientIds.CARBOHYDRATE, NutrientIds.FAT].includes(foodNutrient.nutrient.id)
+                            {props.searchResult.foodNutrients.filter((foodNutrient) => [NutrientIds.ENERGY, NutrientIds.PROTEIN, NutrientIds.CARBOHYDRATE, NutrientIds.FAT].includes(foodNutrient.nutrientId)
                             ).map((foodNutrient) => (
-                                <tr key={foodNutrient.id}>
-                                    <td>{foodNutrient.nutrient.name}</td>
-                                    <td>{foodNutrient.amount} {foodNutrient.nutrient.unitName}</td>
+                                <tr key={foodNutrient.nutrientId}>
+                                    <td>{foodNutrient.nutrientName}</td>
+                                    <td>{foodNutrient.value} {foodNutrient.unitName}</td>
                                 </tr>
                             ))}
                         </tbody>
                     </Table>
                 }
-                {props.showSelect && !props.fdcIds?.includes(props.searchResult.result.fdcId) &&
-                    <Button onClick={() => props.selectFood(props.searchResult.result, props.searchResult.details)}>Select food</Button>
+                {props.showSelect && !props.fdcIds?.includes(props.searchResult.fdcId) &&
+                    <Button onClick={() => props.selectFood()}>Select food</Button>
                 }
-                {props.showSelect && props.fdcIds?.includes(props.searchResult.result.fdcId) &&
+                {props.showSelect && props.fdcIds?.includes(props.searchResult.fdcId) &&
                     <span style={{ 'color': 'green' }}>Food selected</span>
                 }
             </Card.Body>

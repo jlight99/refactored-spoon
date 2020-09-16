@@ -20,35 +20,19 @@ export default function EditMealForm(props) {
     const [fdcIds, setFdcIds] = useState([]);
 
     const updateMealNutrition = () => {
-        const nutrition = {
-            calories: 0,
-            protein: 0,
-            carbs: 0,
-            fat: 0,
-            sugar: 0,
-            fiber: 0,
-            sodium: 0,
-            calcium: 0,
-            iron: 0,
-            cholesterol: 0,
-            potassium: 0,
-            vitaminA: 0,
-            vitaminC: 0,
-        };
+        const nutrition = mealNutrition;
+        Object.keys(nutrition).forEach(nutrient => {
+            if (nutrition[nutrient]) {
+                nutrition[nutrient].value = 0;
+            }
+        });
+
         foods.forEach((food) => {
-            nutrition.calories += food.nutrition.calories;
-            nutrition.protein += food.nutrition.protein;
-            nutrition.carbs += food.nutrition.carbs;
-            nutrition.fat += food.nutrition.fat;
-            nutrition.sugar += food.nutrition.sugar;
-            nutrition.fiber += food.nutrition.fiber;
-            nutrition.sodium += food.nutrition.sodium;
-            nutrition.calcium += food.nutrition.calcium;
-            nutrition.iron += food.nutrition.iron;
-            nutrition.cholesterol += food.nutrition.cholesterol;
-            nutrition.potassium += food.nutrition.potassium;
-            nutrition.vitaminA += food.nutrition.vitaminA;
-            nutrition.vitaminC += food.nutrition.vitaminC;
+            Object.keys(nutrition).forEach(nutrient => {
+                if (nutrition[nutrient] && food.nutrition[nutrient]) {
+                    nutrition[nutrient].value += food.nutrition[nutrient].value;
+                }
+            });
         });
 
         setMealNutrition(nutrition);
@@ -57,7 +41,7 @@ export default function EditMealForm(props) {
     const handleSubmit = event => {
         event.preventDefault();
         const formattedFoods = foods.map((food) => {
-            food.name = food.name ? food.name : food.details.description;
+            food.name = food.name ? food.name : food.description;
             return food;
         });
         const meal = {
@@ -73,22 +57,12 @@ export default function EditMealForm(props) {
         const newFoods = foods.map((oldFood) => {
             const isMatch = food._id ? oldFood._id === food._id : oldFood.fdcId === food.fdcId;
             if (isMatch) {
-                food.serving = parseInt(newServingSize);
-                food.nutrition = {
-                    calories: getRoundedWholeNutrient(oldFood.usdaNutrition.calories, newServingSize),
-                    protein: getRounded2DecNutrient(oldFood.usdaNutrition.protein, newServingSize),
-                    carbs: getRounded2DecNutrient(oldFood.usdaNutrition.carbs, newServingSize),
-                    fat: getRounded2DecNutrient(oldFood.usdaNutrition.fat, newServingSize),
-                    sugar: getRounded2DecNutrient(oldFood.usdaNutrition.sugar, newServingSize),
-                    fiber: getRounded2DecNutrient(oldFood.usdaNutrition.fiber, newServingSize),
-                    sodium: getRoundedWholeNutrient(oldFood.usdaNutrition.sodium, newServingSize),
-                    calcium: getRoundedWholeNutrient(oldFood.usdaNutrition.calcium, newServingSize),
-                    iron: getRounded2DecNutrient(oldFood.usdaNutrition.iron, newServingSize),
-                    cholesterol: getRoundedWholeNutrient(oldFood.usdaNutrition.cholesterol, newServingSize),
-                    potassium: getRoundedWholeNutrient(oldFood.usdaNutrition.potassium, newServingSize),
-                    vitaminA: getRounded2DecNutrient(oldFood.usdaNutrition.vitaminA, newServingSize),
-                    vitaminC: getRounded2DecNutrient(oldFood.usdaNutrition.vitaminC, newServingSize),
-                };
+                food.serving = newServingSize ? parseInt(newServingSize) : 0;
+                Object.keys(food.nutrition).forEach(nutrient => {
+                    if (oldFood.usdaNutrition[nutrient]?.value) {
+                        food.nutrition[nutrient].value = getRoundedNutrient(oldFood.usdaNutrition[nutrient].value, food.serving);
+                    }
+                });
                 return food;
             }
             return oldFood;
@@ -97,71 +71,75 @@ export default function EditMealForm(props) {
         updateMealNutrition();
     };
 
-    const getRounded2DecNutrient = (nutrient, servingSize) => {
-        return Math.round(nutrient * servingSize) / 100;
+    const getRoundedNutrient = (nutrientValue, servingSize) => {
+        return Math.round(nutrientValue * servingSize) / 100;
     };
 
-    const getRoundedWholeNutrient = (nutrient, servingSize) => {
-        return Math.round(nutrient / 100 * servingSize);
+    const getNutrient = (usdaNutrient) => {
+        return {
+            nutrientId: usdaNutrient.nutrientId,
+            nutrientName: usdaNutrient.nutrientName,
+            unitName: usdaNutrient.unitName,
+            value: usdaNutrient.value,
+        };
     };
 
-    const addFood = (food, foodDetails) => {
-        const calories = foodDetails?.foodNutrients?.filter((foodNutrient) => foodNutrient?.nutrient.id === NutrientIds.ENERGY)[0]?.amount;
-        const protein = foodDetails?.foodNutrients?.filter((foodNutrient) => foodNutrient?.nutrient.id === NutrientIds.PROTEIN)[0]?.amount;
-        const carbs = foodDetails?.foodNutrients?.filter((foodNutrient) => foodNutrient?.nutrient.id === NutrientIds.CARBOHYDRATE)[0]?.amount;
-        const fat = foodDetails?.foodNutrients?.filter((foodNutrient) => foodNutrient?.nutrient.id === NutrientIds.FAT)[0]?.amount;
-        const sugar = foodDetails?.foodNutrients?.filter((foodNutrient) => foodNutrient?.nutrient.id === NutrientIds.SUGAR)[0]?.amount;
-        const fiber = foodDetails?.foodNutrients?.filter((foodNutrient) => foodNutrient?.nutrient.id === NutrientIds.FIBER)[0]?.amount;
-        const sodium = foodDetails?.foodNutrients?.filter((foodNutrient) => foodNutrient?.nutrient.id === NutrientIds.SODIUM)[0]?.amount;
-        const calcium = foodDetails?.foodNutrients?.filter((foodNutrient) => foodNutrient?.nutrient.id === NutrientIds.CALCIUM)[0]?.amount;
-        const iron = foodDetails?.foodNutrients?.filter((foodNutrient) => foodNutrient?.nutrient.id === NutrientIds.IRON)[0]?.amount;
-        const cholesterol = foodDetails?.foodNutrients?.filter((foodNutrient) => foodNutrient?.nutrient.id === NutrientIds.CHOLESTEROL)[0]?.amount;
-        const potassium = foodDetails?.foodNutrients?.filter((foodNutrient) => foodNutrient?.nutrient.id === NutrientIds.POTASSIUM)[0]?.amount;
-        const vitaminA = foodDetails?.foodNutrients?.filter((foodNutrient) => foodNutrient?.nutrient.id === NutrientIds.VITAMIN_A)[0]?.amount;
-        const vitaminC = foodDetails?.foodNutrients?.filter((foodNutrient) => foodNutrient?.nutrient.id === NutrientIds.VITAMIN_C)[0]?.amount;
-
+    const addFood = (food) => {
+        const calories = food.foodNutrients?.filter((foodNutrient) => foodNutrient?.nutrientId === NutrientIds.ENERGY)[0];
+        const protein = food.foodNutrients?.filter((foodNutrient) => foodNutrient?.nutrientId === NutrientIds.PROTEIN)[0];
+        const carbs = food.foodNutrients?.filter((foodNutrient) => foodNutrient?.nutrientId === NutrientIds.CARBOHYDRATE)[0];
+        const fat = food.foodNutrients?.filter((foodNutrient) => foodNutrient?.nutrientId === NutrientIds.FAT)[0];
+        const sugar = food.foodNutrients?.filter((foodNutrient) => foodNutrient?.nutrientId === NutrientIds.SUGAR)[0];
+        const fiber = food.foodNutrients?.filter((foodNutrient) => foodNutrient?.nutrientId === NutrientIds.FIBER)[0];
+        const sodium = food.foodNutrients?.filter((foodNutrient) => foodNutrient?.nutrientId === NutrientIds.SODIUM)[0];
+        const calcium = food.foodNutrients?.filter((foodNutrient) => foodNutrient?.nutrientId === NutrientIds.CALCIUM)[0];
+        const iron = food.foodNutrients?.filter((foodNutrient) => foodNutrient?.nutrientId === NutrientIds.IRON)[0];
+        const cholesterol = food.foodNutrients?.filter((foodNutrient) => foodNutrient?.nutrientId === NutrientIds.CHOLESTEROL)[0];
+        const potassium = food.foodNutrients?.filter((foodNutrient) => foodNutrient?.nutrientId === NutrientIds.POTASSIUM)[0];
+        const vitaminA = food.foodNutrients?.filter((foodNutrient) => foodNutrient?.nutrientId === NutrientIds.VITAMIN_A)[0];
+        const vitaminC = food.foodNutrients?.filter((foodNutrient) => foodNutrient?.nutrientId === NutrientIds.VITAMIN_C)[0];
 
         const newFood = {
+            description: food.description,
             brand: food.brandOwner,
             ingredients: food.ingredients,
             fdcId: food.fdcId,
             serving: 100,
             nutrition: {
-                calories: calories ? calories : 0,
-                protein: protein ? protein : 0,
-                carbs: carbs ? carbs : 0,
-                fat: fat ? fat : 0,
-                sugar: sugar ? sugar : 0,
-                fiber: fiber ? fiber : 0,
-                sodium: sodium ? sodium : 0,
-                calcium: calcium ? calcium : 0,
-                iron: iron ? iron : 0,
-                cholesterol: cholesterol ? cholesterol : 0,
-                potassium: potassium ? potassium : 0,
-                vitaminA: vitaminA ? vitaminA : 0,
-                vitaminC: vitaminC ? vitaminC : 0,
+                calories: calories ? getNutrient(calories) : null,
+                protein: protein ? getNutrient(protein) : null,
+                carbs: carbs ? getNutrient(carbs) : null,
+                fat: fat ? getNutrient(fat) : null,
+                sugar: sugar ? getNutrient(sugar) : null,
+                fiber: fiber ? getNutrient(fiber) : null,
+                sodium: sodium ? getNutrient(sodium) : null,
+                calcium: calcium ? getNutrient(calcium) : null,
+                iron: iron ? getNutrient(iron) : null,
+                cholesterol: cholesterol ? getNutrient(cholesterol) : null,
+                potassium: potassium ? getNutrient(potassium) : null,
+                vitaminA: vitaminA ? getNutrient(vitaminA) : null,
+                vitaminC: vitaminC ? getNutrient(vitaminC) : null,
             },
             usdaNutrition: {
-                calories: calories ? calories : 0,
-                protein: protein ? protein : 0,
-                carbs: carbs ? carbs : 0,
-                fat: fat ? fat : 0,
-                sugar: sugar ? sugar : 0,
-                fiber: fiber ? fiber : 0,
-                sodium: sodium ? sodium : 0,
-                calcium: calcium ? calcium : 0,
-                iron: iron ? iron : 0,
-                cholesterol: cholesterol ? cholesterol : 0,
-                potassium: potassium ? potassium : 0,
-                vitaminA: vitaminA ? vitaminA : 0,
-                vitaminC: vitaminC ? vitaminC : 0,
+                calories: calories ? getNutrient(calories) : null,
+                protein: protein ? getNutrient(protein) : null,
+                carbs: carbs ? getNutrient(carbs) : null,
+                fat: fat ? getNutrient(fat) : null,
+                sugar: sugar ? getNutrient(sugar) : null,
+                fiber: fiber ? getNutrient(fiber) : null,
+                sodium: sodium ? getNutrient(sodium) : null,
+                calcium: calcium ? getNutrient(calcium) : null,
+                iron: iron ? getNutrient(iron) : null,
+                cholesterol: cholesterol ? getNutrient(cholesterol) : null,
+                potassium: potassium ? getNutrient(potassium) : null,
+                vitaminA: vitaminA ? getNutrient(vitaminA) : null,
+                vitaminC: vitaminC ? getNutrient(vitaminC) : null,
             },
-            details: foodDetails,
         };
         setFoods(foods => [...foods, newFood]);
         setFdcIds(fdcIds => [...fdcIds, food.fdcId]);
 
-        const newMealNutrition = calculateNewMealNutrition(newFood, 1);
+        const newMealNutrition = calculateNewMealNutrition(newFood, 1.0);
         setMealNutrition(newMealNutrition);
     };
 
@@ -171,7 +149,7 @@ export default function EditMealForm(props) {
         setFoods(foods.filter(food => food.fdcId !== garbageFdcId));
         setFdcIds(fdcIds.filter(fdcId => fdcId !== garbageFdcId));
 
-        const newMealNutrition = calculateNewMealNutrition(removedFood, -1);
+        const newMealNutrition = calculateNewMealNutrition(removedFood, -1.0);
         setMealNutrition(newMealNutrition);
     };
 
@@ -179,30 +157,36 @@ export default function EditMealForm(props) {
         const removedFood = foods.filter(food => food._id === garbageId)[0];
         setFoods(foods.filter(food => food._id !== garbageId));
 
-        const newMealNutrition = calculateNewMealNutrition(removedFood, -1);
+        const newMealNutrition = calculateNewMealNutrition(removedFood, -1.0);
         setMealNutrition(newMealNutrition);
     };
 
     const calculateNewMealNutrition = (updatedFood, sign) => {
-        return {
-            calories: calculateNewNutrient(mealNutrition.calories, updatedFood.nutrition.calories, sign),
-            protein: calculateNewNutrient(mealNutrition.protein, updatedFood.nutrition.protein, sign),
-            carbs: calculateNewNutrient(mealNutrition.carbs, updatedFood.nutrition.carbs, sign),
-            fat: calculateNewNutrient(mealNutrition.fat, updatedFood.nutrition.fat, sign),
-            sugar: calculateNewNutrient(mealNutrition.sugar, updatedFood.nutrition.sugar, sign),
-            fiber: calculateNewNutrient(mealNutrition.fiber, updatedFood.nutrition.fiber, sign),
-            sodium: calculateNewNutrient(mealNutrition.sodium, updatedFood.nutrition.sodium, sign),
-            calcium: calculateNewNutrient(mealNutrition.calcium, updatedFood.nutrition.calcium, sign),
-            iron: calculateNewNutrient(mealNutrition.iron, updatedFood.nutrition.iron, sign),
-            cholesterol: calculateNewNutrient(mealNutrition.cholesterol, updatedFood.nutrition.cholesterol, sign),
-            potassium: calculateNewNutrient(mealNutrition.potassium, updatedFood.nutrition.potassium, sign),
-            vitaminA: calculateNewNutrient(mealNutrition.vitaminA, updatedFood.nutrition.vitaminA, sign),
-            vitaminC: calculateNewNutrient(mealNutrition.vitaminC, updatedFood.nutrition.vitaminC, sign),
-        };
+        var nutrition = mealNutrition;
+        if (!checkNutritionExists(mealNutrition)) {
+            const newMealNutrition = {};
+            Object.keys(updatedFood.nutrition).forEach(nutrient => {
+                if (updatedFood.nutrition[nutrient]) {
+                    newMealNutrition[nutrient] = {
+                        nutrientId: updatedFood.nutrition[nutrient].nutrientId,
+                        nutrientName: updatedFood.nutrition[nutrient].nutrientName,
+                        unitName: updatedFood.nutrition[nutrient].unitName,
+                        value: updatedFood.nutrition[nutrient].value,
+                    };
+                }
+            });
+            return newMealNutrition;
+        }
+        Object.keys(nutrition).forEach(nutrient => {
+            if (nutrition[nutrient] && updatedFood.nutrition[nutrient]) {
+                nutrition[nutrient].value = calculateNewNutrient(nutrition[nutrient].value, updatedFood.nutrition[nutrient].value, sign);
+            }
+        });
+        return nutrition;
     };
 
     const calculateNewNutrient = (mealNutrient, foodNutrient, sign) => {
-        return (mealNutrient ? mealNutrient : 0) + sign * (foodNutrient ? foodNutrient : 0);
+        return (mealNutrient ? mealNutrient : 0) + sign * (foodNutrient ? foodNutrient : 0)
     };
 
     return (
@@ -220,7 +204,7 @@ export default function EditMealForm(props) {
                         </Dropdown.Menu>
                     </Dropdown>
 
-                    {checkNutritionExists(mealNutrition) &&
+                    {foods?.length > 0 && checkNutritionExists(mealNutrition) &&
                         <div>
                             Nutrition summary
                             <NutritionTable nutrition={mealNutrition} />
@@ -233,7 +217,7 @@ export default function EditMealForm(props) {
                             <EditableFood
                                 key={food._id ? food._id : food.fdcId}
                                 food={food}
-                                updateServingSize={updateServingSize}
+                                updateServingSize={(servingSize) => updateServingSize(food, servingSize)}
                                 removeFood={props.meal ? removeFoodFromEditForm : removeFoodFromAddForm}
                             />
                         ))}
