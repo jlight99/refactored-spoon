@@ -2,6 +2,32 @@
   text-align: center;
 }
 
+.background {
+  background: linear-gradient( rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.3) ), url('/public/food-background.jpg');
+  background-size: cover;
+  min-height: 100vh;
+  background-blend-mode: darken;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.sign-in-form {
+  padding-top: 8%;
+  color: white;
+  font-size: 1.3em;
+}
+
+.loginErrorMsg {
+  color: red;
+  padding-top: 1.2em;
+  font-size: 1.1em;
+}
+
+.nutritionSummary {
+  padding-top: 20px;
+  padding-bottom: 0.7em;
+}
+
 .App-logo {
   height: 40vmin;
   pointer-events: none;

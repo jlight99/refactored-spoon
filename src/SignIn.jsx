@@ -34,8 +34,10 @@ export default function SignIn(props) {
             localStorage.setItem('currentUser', JSON.stringify(responseText));
             props.setAuthenticated(true);
             history.push('/days');
+        } else if (type === 'signup' && response.status === 409) {
+            setError(responseText);
         } else {
-            setError("error with " + type + "\n" + responseText);
+            setError("Error with " + type + ":\n" + responseText);
         }
     };
 
@@ -68,7 +70,7 @@ export default function SignIn(props) {
                     />
                 </Tab>
             </Tabs>
-            {error && <div style={{ color: "red" }}>sign in unsuccessful :(</div>}
+            {error && <div className="loginErrorMsg">{error}</div>}
         </div>
     );
 }

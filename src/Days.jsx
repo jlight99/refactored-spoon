@@ -149,13 +149,15 @@ export default function Days(props) {
                 <div>
                     {day?.meals && checkNutritionExists(day.nutrition) &&
                         <span>
-                            Daily nutrition summary
+                            <div className="nutritionSummary">
+                                Daily nutrition summary
+                            </div>
                             <NutritionTable nutrition={day.nutrition} />
                         </span>
                     }
                 </div>
             </div>}
-            {!day?.meals && <div>no data for this date</div>}
+            {!day?.meals && <div>No data for this date</div>}
         </div>
     );
 }

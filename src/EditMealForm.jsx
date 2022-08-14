@@ -206,7 +206,9 @@ export default function EditMealForm(props) {
 
                     {foods?.length > 0 && checkNutritionExists(mealNutrition) &&
                         <div>
-                            Nutrition summary
+                            <div className="nutritionSummary">
+                                Nutrition summary
+                            </div>
                             <NutritionTable nutrition={mealNutrition} />
                         </div>
                     }
